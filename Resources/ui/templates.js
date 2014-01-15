@@ -1,3 +1,7 @@
+var images = [];
+for (var i = 0; i <= 16; i++)
+	images.push('/images/vumeter/tmp-' + i + '.png');
+
 exports.timelineactiveTemplate = {
 	properties : {
 		height : '100dip',
@@ -6,6 +10,14 @@ exports.timelineactiveTemplate = {
 		}
 	},
 	childTemplates : [{
+		type : 'Ti.UI.ImageView',
+		bindId : 'play',
+		properties : {
+			width : '40dp',
+			height : '44dp',
+			right : '5dp'
+		}
+	}, {
 		type : 'Ti.UI.ImageView',
 		bindId : 'stationlogo',
 		properties : {
@@ -26,6 +38,7 @@ exports.timelineactiveTemplate = {
 			},
 			top : '10dp',
 			left : '100dip',
+			right : '30dp'
 		}
 	}, {
 		type : 'Ti.UI.Label',

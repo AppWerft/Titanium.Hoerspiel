@@ -10,55 +10,51 @@ exports.create = function() {
 	listView.update = function() {
 		var termine = Ti.App.Model.getSendungen();
 		var sections = [];
-		for (var s = 0; s < 2; s++) {
+		for (var s = 0; s < 3; s++) {
 			var sendungen = [];
-			for (var i = 0; i < termine[s].length; i++) {
-				var sendung = termine[s][i];
-				var listdataitem = {
-					properties : {
-						itemId : sendung.livestreamurl,
-						accessoryType : (s == 0) ? Ti.UI.LIST_ACCESSORY_TYPE_DISCLOSURE : Ti.UI.LIST_ACCESSORY_TYPE_NONE,
-					},
-					title : {
-						text : sendung.name
-					},
-					time : {
-						text : (s == 0) ? 'seit ' + sendung.start + ' Uhr' : sendung.start + ' Uhr (' + sendung.duration + ' min.)'
-					},
-					stationlogo : {
-						image : Ti.Filesystem.getFile('/images/' + sendung.senderid + '.png') ? '/images/' + sendung.senderid + '.png' : '/images/nil.png'
+			if (termine[s])
+				for (var i = 0; i < termine[s].length; i++) {
+					var sendung = termine[s][i];
+					var listdataitem = {
+						properties : {
+							itemId : sendung.livestreamurl,
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_NONE,
+						},
+						title : {
+							text : sendung.name
+						},
+						time : {
+							text : (s == 0) ? 'seit ' + sendung.start + ' Uhr' : sendung.start + ' Uhr (' + sendung.duration + ' min.)'
+						},
+						stationlogo : {
+							image : Ti.Filesystem.getFile('/images/' + sendung.senderid + '.png') ? '/images/' + sendung.senderid + '.png' : '/images/nil.png'
+						}
+					};
+					if (s == 0) {
+						listdataitem.template = 'atemplate';
+						var width = parseInt((sendung.progress * 90) % 90);
+						listdataitem.play = {
+							image : '/images/play.png'
+						};
+						listdataitem.progressview = {
+							width : width // (0...1)
+						};
 					}
-				};
-				if (s == 0) {
-					listdataitem.template = 'atemplate';
-					listdataitem.progressbar = {
-						value : sendung.progress // (0...1)
-					};
-					var width = parseInt((sendung.progress * 90)%90);
-					console.log(width);
-					listdataitem.progressview = {
-						width : width // (0...1)
-					};
-
-
+					sendungen.push(listdataitem);
 				}
-				sendungen.push(listdataitem);
-			}
+			var headertitles = ['on air @ ' + require('vendor/moment')().format('HH:mm') + ' Uhr', ' in next future', 'tomorow'];
 			sections[s] = Ti.UI.createListSection({
-				headerTitle : (s == 0) ? 'on air @ ' + require('vendor/moment')().format('HH:mm') + ' Uhr' : ' in next future …',
+				headerTitle : headertitles[s],
 				items : sendungen
 			});
 		}
-		sections[0].updateItemAt(0, {
-			progressbar : {
-				value : 0.8
-			}
-		});
 		listView.setSections(sections);
 	};
 	listView.addEventListener('itemclick', function(e) {
 		var item = e.section.getItemAt(e.itemIndex);
 		console.log(item);
+		e.section.updateItemAt(e.itemIndex, item);
+
 	});
 	return listView;
 };

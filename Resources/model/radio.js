@@ -66,7 +66,7 @@ Radio.prototype.getSendungen = function() {
 	var moment = require('vendor/moment');
 	var stop = parseInt(moment().format('H') * 60) + parseInt(moment().format('m'));
 	var wd = moment().format('d');
-	var q = 'SELECT * FROM termine WHERE  wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
+	var q = 'SELECT * FROM termine WHERE wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
 	var res = link.execute(q);
 	var termine = [[], []];
 	while (res.isValidRow()) {
@@ -89,7 +89,6 @@ Radio.prototype.getSendungen = function() {
 		else {
 			termine[1].push(termin);
 		}
-		console.log(JSON.stringify(termin));
 		res.next();
 	}
 	res.close();
