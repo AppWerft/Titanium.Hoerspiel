@@ -14,6 +14,7 @@ exports.timelineactiveTemplate = {
 		bindId : 'play',
 		properties : {
 			width : '40dp',
+			opacity : 0.5,
 			height : '44dp',
 			right : '5dp'
 		}

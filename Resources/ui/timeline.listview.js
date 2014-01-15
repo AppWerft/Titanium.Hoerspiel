@@ -1,4 +1,4 @@
-exports.create = function() {
+exports.create = function(_parent) {
 	var listView = Ti.UI.createListView({
 		templates : {
 			'atemplate' : require('ui/templates').timelineactiveTemplate,
@@ -42,7 +42,7 @@ exports.create = function() {
 					}
 					sendungen.push(listdataitem);
 				}
-			var headertitles = ['on air @ ' + require('vendor/moment')().format('HH:mm') + ' Uhr', ' in next future', 'tomorow'];
+			var headertitles = ['on air @ ' + require('vendor/moment')().format('HH:mm') + ' Uhr', ' in next future', 'tomorrow'];
 			sections[s] = Ti.UI.createListSection({
 				headerTitle : headertitles[s],
 				items : sendungen
@@ -50,10 +50,13 @@ exports.create = function() {
 		}
 		listView.setSections(sections);
 	};
+	var Radio = require('ui/radio.widget');
+	listView.radiowidget = new Radio();
 	listView.addEventListener('itemclick', function(e) {
 		var item = e.section.getItemAt(e.itemIndex);
-		console.log(item);
-		e.section.updateItemAt(e.itemIndex, item);
+		_parent.add(listView.radiowidget.getView());
+		listView.radiowidget.togglePlay(e.itemId);	
+		//e.section.updateItemAt(e.itemIndex, item);
 
 	});
 	return listView;

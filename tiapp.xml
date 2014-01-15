@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
     <id>de.appwerft.hoerspiel</id>
-    <name>Hoerspiel</name>
+    <name>Hörspiele</name>
     <version>1.0</version>
     <publisher>rainerschleevoigt</publisher>
     <url>http://</url>
@@ -41,7 +41,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <!-- <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>-->
-        <manifest android:versionCode="1" android:versionName="1.1"
+        <manifest android:versionCode="2" android:versionName="1.2"
             package="de.appwerft.hoerspiel" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

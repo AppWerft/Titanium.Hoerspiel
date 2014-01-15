@@ -1,6 +1,6 @@
 exports.create = function() {
 	var self = Ti.UI.createWindow({});
-	self.listview = require('ui/timeline.listview').create();
+	self.listview = require('ui/timeline.listview').create(self);
 	self.add(self.listview);
 	self.addEventListener('focus', function() {
 		self.listview.update();

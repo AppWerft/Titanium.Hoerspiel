@@ -99,7 +99,12 @@ Radio.prototype.getSendungen = function() {
 Radio.prototype.getUrl = function(_args) {
 	var xhr = Ti.Network.createHTTPClient({
 		onload : function() {
-			_args.onload(this.responseText.split('\n')[0]);
+			var foo = this.responseText.split('\n');
+			var bar = [];
+			for (var i=0;i<foo.length;i++) {
+				if (foo[i][0] !='#') bar.push(foo[i]);
+			}
+			_args.onload(bar[0]);
 		}
 	});
 	xhr.open('GET', _args.m3u);

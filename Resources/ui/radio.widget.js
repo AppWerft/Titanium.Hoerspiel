@@ -1,65 +1,74 @@
+var W = '200dp', H = '50dp';
 var Radio = function() {
 	this.view = Ti.UI.createView({
-		width : '100dip',
-		height : '25dip',
-		bottom : 0
+		width : W,
+		height : H,
+		bottom : '-' + H
 	});
 	var images = [];
 	for (var i = 0; i <= 16; i++)
 		images.push('/images/vumeter/tmp-' + i + '.png');
 	this.vu = Ti.UI.createImageView({
 		images : images,
+		width : Ti.UI.FILL,
+		height : Ti.UI.FILL,
+
 		touchEnabled : false,
 		bottom : 0,
-		width : '100dip',
-		height : '25dip',
-		duration : 40
+		duration : 140
 	});
-	var starter = Ti.UI.createImageView({
-		image : images[0],
+	this.starter = Ti.UI.createImageView({
+		image : '/images/vumeter/tmp.png',
+		width : Ti.UI.FILL,
+		height : Ti.UI.FILL,
 		bottom : 0,
-		width : '100dip',
-		height : '25dip',
 		duration : 40
 	});
-	this.view.add(starter);
+	this.view.add(this.starter);
 	this.audioPlayer = Ti.Media.createAudioPlayer({
 		allowBackground : true
 	});
-	Ti.Android && Ti.UI.createNotification({
-		message : 'Hole Radiosender …'
-	}).show();
-	self.add(vu);
-	self.add(starter);
+
 };
 
 Radio.prototype.getView = function() {
 	return this.view;
 };
 
-Radio.prototype.startPlay = function(_m3u) {
-	Ti.App.Model.getUrl({
-		m3u : _m3u,
-		onload : function(_url) {
-			Ti.Android && Ti.UI.createNotification({
-				message : 'Starte Wiedergabe …'
-			}).show();
-			this.audioPlayer.setUrl(_url);
-		}
-	});
-	if (this.audioPlayer.playing == true) {
+Radio.prototype.togglePlay = function(_m3u) {
+	var self = this;
+	if (this.audioPlayer.playing == true && this.url == _m3u) {
 		this.audioPlayer.stop();
 		this.vu.stop();
+		self.view.remove(self.vu);
+		this.view.animate({
+			bottom : '-' + H
+		});
 	} else {
-		console.log(_sender.livestream.url);
-		this.vu.start();
-		this.audioPlayer.play();
+		this.url = _m3u;
+		this.view.animate({
+			bottom : 0
+		});
+		Ti.Android && Ti.UI.createNotification({
+			message : 'Verbinde mit Sender …'
+		}).show();
+		Ti.App.Model.getUrl({
+			m3u : _m3u,
+			onload : function(_url) {
+				console.log(_url);
+				self.audioPlayer.setUrl(_url);
+				self.vu.start();
+				self.view.add(self.vu);
+				self.audioPlayer.play();
+			}
+		});
+
 	}
 };
 
 Radio.prototype.close = function() {
 	if (this.audioPlayer.playing == true)
-		this.audioPlayer.stop();  
+		this.audioPlayer.stop();
 	Ti.Android && this.audioPlayer.release();
 
 };
