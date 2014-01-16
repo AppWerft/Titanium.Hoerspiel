@@ -66,10 +66,10 @@ var Radio = function() {
 				bottom : '-' + HH
 			});
 		}
+		require('vendor/ratingreminder').start();
 	});
 
 };
-
 Radio.prototype.getView = function() {
 	return this.radiocontainer;
 };

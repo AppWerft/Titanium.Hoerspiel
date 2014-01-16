@@ -30,6 +30,7 @@ exports.create = function(_parent) {
 							image : Ti.Filesystem.getFile('/images/' + sendung.senderid + '.png') ? '/images/' + sendung.senderid + '.png' : '/images/nil.png'
 						}
 					};
+					if (s ==2) listdataitem.time.text = 'morgen ' + listdataitem.time.text;
 					if (s == 0) {
 						listdataitem.template = 'atemplate';
 						var width = parseInt((sendung.progress * 90) % 90);
