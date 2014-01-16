@@ -1,10 +1,16 @@
+const LIST = 'listofstationgroupsasarray';
+
 var Radio = function() {
 	this.importList();
 	return this;
 };
 
 Radio.prototype.importList = function() {
-	Ti.App.Properties.setList('list', JSON.parse(Ti.Filesystem.getFile('/model/senderliste.json').read().text));
+	if (!Ti.App.Properties.hasProperty(LIST)) {// app is virgin
+		var jsonstring = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory,'model','senderliste.json').read().text;
+		console.log(jsonstring);
+		Ti.App.Properties.setList(LIST, JSON.parse(jsonstring));
+	}
 	if (Ti.Network.online) {
 		var yql = 'SELECT * FROM xml WHERE url="' + Ti.App.Properties.getString('radiourl') + '"';
 		Ti.Yahoo.yql(yql, function(e) {
@@ -43,13 +49,13 @@ Radio.prototype.importList = function() {
 					}
 				}
 				link.close();
-				Ti.App.Properties.setList('list', e.data.senderliste.senderfamilie);
+				Ti.App.Properties.setList(LIST, e.data.senderliste.senderfamilie);
 			}
 		});
 	}
 };
 Radio.prototype.getStationGroups = function() {
-	return Ti.App.Properties.getList('list');
+	return Ti.App.Properties.getList(LIST);
 };
 
 Radio.prototype.getSendungen = function() {
