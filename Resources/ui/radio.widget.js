@@ -37,21 +37,31 @@ Radio.prototype.getView = function() {
 
 Radio.prototype.togglePlay = function(_m3u) {
 	var self = this;
-	if (this.audioPlayer.playing == true && this.url == _m3u) {
+	if (this.audioPlayer.playing == true) {
+		Ti.Android && Ti.UI.createNotification({
+			message : 'Entbinde von Sender …'
+		}).show();
+		console.log('is playing => stop');
 		this.audioPlayer.stop();
 		this.vu.stop();
-		self.view.remove(self.vu);
+		this.view.remove(self.vu);
+	//	this.url = _m3u;
+	}
+	if (this.url == _m3u) {
+		console.log('Info: same station and is playing');
+		
+		delete this.url;
 		this.view.animate({
 			bottom : '-' + H
 		});
 	} else {
-		this.url = _m3u;
 		this.view.animate({
 			bottom : 0
 		});
 		Ti.Android && Ti.UI.createNotification({
 			message : 'Verbinde mit Sender …'
 		}).show();
+		
 		Ti.App.Model.getUrl({
 			m3u : _m3u,
 			onload : function(_url) {

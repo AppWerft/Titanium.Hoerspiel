@@ -4,6 +4,7 @@ var Radio = function() {
 };
 
 Radio.prototype.importList = function() {
+	Ti.App.Properties.setList('list', JSON.parse(Ti.Filesystem.getFile('/model/senderliste.json').read().text));
 	if (Ti.Network.online) {
 		var yql = 'SELECT * FROM xml WHERE url="' + Ti.App.Properties.getString('radiourl') + '"';
 		Ti.Yahoo.yql(yql, function(e) {
@@ -14,8 +15,6 @@ Radio.prototype.importList = function() {
 				link.execute('DROP TABLE IF EXISTS sender');
 				link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
 				link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT,livestreamurl TEXT)');
-				link.execute('DELETE FROM termine');
-				link.execute('DELETE FROM sender');
 				// Sendergruppen
 				for (var i = 0; i < groups.length; i++) {
 					var group = (Object.prototype.toString.call(groups[i].sender) === '[object Array]') ? groups[i].sender : [groups[i].sender];
@@ -35,20 +34,12 @@ Radio.prototype.importList = function() {
 									var tmp = termine[t].zeit.split(':');
 									var start = 60 * parseInt(tmp[0]) + parseInt(tmp[1]);
 									var stop = start + parseInt(termine[t].dauer);
-									link.execute('INSERT INTO termine VALUES (?,?,?,?,?,?,?)',
-									  termine[t].tag, 
-									  start, 
-									  stop, 
-									  sendungen[s].name, 
-									  sender.id, 
-									  sendungen[s].id,
-									  sender.livestream.url);
-									
+									link.execute('INSERT INTO termine VALUES (?,?,?,?,?,?,?)', termine[t].tag, start, stop, sendungen[s].name, sender.id, sendungen[s].id, sender.livestream.url);
+
 									//		console.log('wd='+termine[t].tag+' start='+start+ ' stop=' +stop);
 								}
 							}
 						}
-
 					}
 				}
 				link.close();
@@ -101,8 +92,9 @@ Radio.prototype.getUrl = function(_args) {
 		onload : function() {
 			var foo = this.responseText.split('\n');
 			var bar = [];
-			for (var i=0;i<foo.length;i++) {
-				if (foo[i][0] !='#') bar.push(foo[i]);
+			for (var i = 0; i < foo.length; i++) {
+				if (foo[i][0] != '#')
+					bar.push(foo[i]);
 			}
 			_args.onload(bar[0]);
 		}
