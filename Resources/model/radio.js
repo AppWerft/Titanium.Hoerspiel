@@ -76,7 +76,7 @@ Radio.prototype.getSendungen = function() {
 		if (mm < 10)
 			mm = '0' + mm;
 		var duration = res.fieldByName('stop') - res.fieldByName('start');
-		return {
+		return { 
 			livestreamurl : res.fieldByName('livestreamurl'),
 			start : hh + ':' + mm,
 			duration : duration,
