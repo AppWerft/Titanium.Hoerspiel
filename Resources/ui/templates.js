@@ -4,10 +4,8 @@ for (var i = 0; i <= 16; i++)
 
 exports.timelineactiveTemplate = {
 	properties : {
-		height : '100dip',
-		onDisplayItem : function(_e) {
-			console.log(JSON.stringify(_e));
-		}
+		height : '100dip'
+		
 	},
 	childTemplates : [{
 		type : 'Ti.UI.ImageView',

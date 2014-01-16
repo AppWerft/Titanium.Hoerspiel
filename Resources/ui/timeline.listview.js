@@ -17,7 +17,7 @@ exports.create = function(_parent) {
 					var sendung = termine[s][i];
 					var listdataitem = {
 						properties : {
-							itemId : sendung.livestreamurl,
+							itemId : JSON.stringify(sendung),
 							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_NONE,
 						},
 						title : {
@@ -50,14 +50,17 @@ exports.create = function(_parent) {
 		}
 		listView.setSections(sections);
 	};
+	_parent.add(listView);
+	
 	var Radio = require('ui/radio.widget');
 	listView.radiowidget = new Radio();
+	_parent.add(listView.radiowidget.getView());
 	listView.addEventListener('itemclick', function(e) {
 		var item = e.section.getItemAt(e.itemIndex);
-		_parent.add(listView.radiowidget.getView());
-		listView.radiowidget.togglePlay(e.itemId);	
+		listView.radiowidget.togglePlay(JSON.parse(e.itemId));
 		//e.section.updateItemAt(e.itemIndex, item);
 
 	});
+	
 	return listView;
 };

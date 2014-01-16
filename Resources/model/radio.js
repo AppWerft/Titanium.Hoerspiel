@@ -1,4 +1,4 @@
-const LIST = 'listofstationgroupsasarray';
+const RADIOLIST = 'RadioList';
 
 var Radio = function() {
 	this.importList();
@@ -6,64 +6,77 @@ var Radio = function() {
 };
 
 Radio.prototype.importList = function() {
-	if (!Ti.App.Properties.hasProperty(LIST)) {// app is virgin
-		var jsonstring = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory,'model','senderliste.json').read().text;
-		console.log(jsonstring);
-		Ti.App.Properties.setList(LIST, JSON.parse(jsonstring));
+	var self = this;
+	function importIntoDB(groups) {
+		var link = Ti.Database.open(RADIOLIST);
+		link.execute('DROP TABLE IF EXISTS termine');
+		link.execute('DROP TABLE IF EXISTS sender');
+		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
+		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT,livestreamurl TEXT)');
+		link.execute('BEGIN');
+
+		// Sendergruppen
+		for (var i = 0; i < groups.length; i++) {
+			var group = (Object.prototype.toString.call(groups[i].sender) === '[object Array]') ? groups[i].sender : [groups[i].sender];
+			var stations = [];
+			// Sender (Stationen)
+			for (var g = 0; g < group.length; g++) {
+				var sender = group[g];
+				link.execute('INSERT INTO sender VALUES (?,?,?,?)', sender.id, sender.name, sender.longname, sender.livestream.url);
+				var sendungen = (Object.prototype.toString.call(sender.sendung) === '[object Array]') ? sender.sendung : [sender.sendung];
+				for (var s = 0; s < sendungen.length; s++) {
+					var sendung = sendungen[s];
+					if (!sendung)
+						continue;
+					var termine = (Object.prototype.toString.call(sendung.sendetermin) === '[object Array]') ? sendung.sendetermin : [sendung.sendetermin];
+					for (var t = 0; t < termine.length; t++) {
+						if (termine[t].dauer) {
+							var tmp = termine[t].zeit.split(':');
+							var start = 60 * parseInt(tmp[0]) + parseInt(tmp[1]);
+							var stop = start + parseInt(termine[t].dauer);
+							link.execute('INSERT INTO termine VALUES (?,?,?,?,?,?,?)', termine[t].tag, start, stop, sendungen[s].name, sender.id, sendungen[s].id, sender.livestream.url);
+
+							//		console.log('wd='+termine[t].tag+' start='+start+ ' stop=' +stop);
+						}
+					}
+				}
+			}
+		}
+		link.execute('COMMIT');
+		link.close();
+		Ti.App.Properties.setList(RADIOLIST, groups);
+	};
+	if (!Ti.App.Properties.hasProperty(RADIOLIST)) {// app is virgin
+		var groups = JSON.parse(Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'model', 'senderliste.json').read().text);
+		Ti.App.Properties.setList(RADIOLIST, groups);
+		importIntoDB(groups);
 	}
 	if (Ti.Network.online) {
 		var yql = 'SELECT * FROM xml WHERE url="' + Ti.App.Properties.getString('radiourl') + '"';
 		Ti.Yahoo.yql(yql, function(e) {
 			if (e.success) {
 				var groups = e.data.senderliste.senderfamilie;
-				var link = Ti.Database.open('radio');
-				link.execute('DROP TABLE IF EXISTS termine');
-				link.execute('DROP TABLE IF EXISTS sender');
-				link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
-				link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT,livestreamurl TEXT)');
-				// Sendergruppen
-				for (var i = 0; i < groups.length; i++) {
-					var group = (Object.prototype.toString.call(groups[i].sender) === '[object Array]') ? groups[i].sender : [groups[i].sender];
-					var stations = [];
-					// Sender (Stationen)
-					for (var g = 0; g < group.length; g++) {
-						var sender = group[g];
-						link.execute('INSERT INTO sender VALUES (?,?,?,?)', sender.id, sender.name, sender.longname, sender.livestream.url);
-						var sendungen = (Object.prototype.toString.call(sender.sendung) === '[object Array]') ? sender.sendung : [sender.sendung];
-						for (var s = 0; s < sendungen.length; s++) {
-							var sendung = sendungen[s];
-							if (!sendung)
-								continue;
-							var termine = (Object.prototype.toString.call(sendung.sendetermin) === '[object Array]') ? sendung.sendetermin : [sendung.sendetermin];
-							for (var t = 0; t < termine.length; t++) {
-								if (termine[t].dauer) {
-									var tmp = termine[t].zeit.split(':');
-									var start = 60 * parseInt(tmp[0]) + parseInt(tmp[1]);
-									var stop = start + parseInt(termine[t].dauer);
-									link.execute('INSERT INTO termine VALUES (?,?,?,?,?,?,?)', termine[t].tag, start, stop, sendungen[s].name, sender.id, sendungen[s].id, sender.livestream.url);
-
-									//		console.log('wd='+termine[t].tag+' start='+start+ ' stop=' +stop);
-								}
-							}
-						}
-					}
-				}
-				link.close();
-				Ti.App.Properties.setList(LIST, e.data.senderliste.senderfamilie);
+				importIntoDB(groups);
 			}
 		});
 	}
 };
+
 Radio.prototype.getStationGroups = function() {
-	return Ti.App.Properties.getList(LIST);
+	return Ti.App.Properties.getList(RADIOLIST);
 };
 
 Radio.prototype.getSendungen = function() {
-	var link = Ti.Database.open('radio');
+	console.log('Info: try to open ' + RADIOLIST);
+	try {
+		var link = Ti.Database.open(RADIOLIST);
+	} catch(E) {
+		return [[],[],[]];
+	}
 	var moment = require('vendor/moment');
 	var stop = parseInt(moment().format('H') * 60) + parseInt(moment().format('m'));
 	var wd = moment().format('d');
-	var q = 'SELECT * FROM termine WHERE wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
+	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
 	var res = link.execute(q);
 	var termine = [[], []];
 	while (res.isValidRow()) {
@@ -78,6 +91,7 @@ Radio.prototype.getSendungen = function() {
 			start : hh + ':' + mm,
 			duration : duration,
 			senderid : res.fieldByName('senderid'),
+			senderlongname : res.fieldByName('longname'),
 			name : res.fieldByName('name'),
 			progress : (now - parseInt(res.fieldByName('start'))) / duration
 		};
