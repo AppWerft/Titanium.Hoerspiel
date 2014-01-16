@@ -68,25 +68,15 @@ Radio.prototype.getStationGroups = function() {
 
 Radio.prototype.getSendungen = function() {
 	console.log('Info: try to open ' + RADIOLIST);
-	try {
-		var link = Ti.Database.open(RADIOLIST);
-	} catch(E) {
-		return [[],[],[]];
-	}
 	var moment = require('vendor/moment');
-	var stop = parseInt(moment().format('H') * 60) + parseInt(moment().format('m'));
-	var wd = moment().format('d');
-	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
-	var res = link.execute(q);
-	var termine = [[], []];
-	while (res.isValidRow()) {
+	var now = parseInt(moment().format('HH')) * 60 + parseInt(moment().format('m'));
+	function res2termin(res) {
 		var hh = Math.floor(res.fieldByName('start') / 60);
 		var mm = Math.ceil(res.fieldByName('start') % 60);
 		if (mm < 10)
 			mm = '0' + mm;
 		var duration = res.fieldByName('stop') - res.fieldByName('start');
-		var now = parseInt(moment().format('HH')) * 60 + parseInt(moment().format('m'));
-		var termin = {
+		return {
 			livestreamurl : res.fieldByName('livestreamurl'),
 			start : hh + ':' + mm,
 			duration : duration,
@@ -95,11 +85,35 @@ Radio.prototype.getSendungen = function() {
 			name : res.fieldByName('name'),
 			progress : (now - parseInt(res.fieldByName('start'))) / duration
 		};
+	}
+
+	try {
+		var link = Ti.Database.open(RADIOLIST);
+	} catch(E) {
+		return [[], [], []];
+	}
+	var stop = parseInt(moment().format('H') * 60) + parseInt(moment().format('m'));
+	var wd = moment().format('d');
+	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
+	var res = link.execute(q);
+	var termine = [[], [], []];
+	while (res.isValidRow()) {
+		termin = res2termin(res);
 		if (now >= res.fieldByName('start'))
 			termine[0].push(termin);
 		else {
 			termine[1].push(termin);
 		}
+		res.next();
+	}
+	res.close();
+	wd = (wd + 1) % 7;
+	if (!wd)
+		wd = 7;
+	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
+	var res = link.execute(q);
+	while (res.isValidRow()) {
+		termine[2].push(res2termin(res));
 		res.next();
 	}
 	res.close();

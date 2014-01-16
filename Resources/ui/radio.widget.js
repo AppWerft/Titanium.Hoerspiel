@@ -80,9 +80,6 @@ Radio.prototype.togglePlay = function(_options) {
 	if (senderlongname == this.last.name)
 		return;
 	if (this.audioPlayer.playing == true) {
-		Ti.Android && Ti.UI.createNotification({
-			message : 'Beende\n' + this.last.name
-		}).show();
 		this.audioPlayer.stop();
 		Ti.Android && this.audioPlayer.release();
 		
