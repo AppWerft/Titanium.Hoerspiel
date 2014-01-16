@@ -41,7 +41,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <!-- <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>-->
-        <manifest android:versionCode="4" android:versionName="1.4"
+        <manifest android:versionCode="5" android:versionName="1.5"
             package="de.appwerft.hoerspiel" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>

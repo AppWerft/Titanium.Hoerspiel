@@ -1,17 +1,15 @@
-var W = '200dp', H = '50dp', HH = '70dp';
+var W = '200dp', H = '50dp', HH = '66dp';
 
 var Radio = function() {
 	this.last = {
 		url : null,
 		name : null
 	};
-	this.view = Ti.UI.createView({
+	this.radiocontainer = Ti.UI.createView({
 		width : W,
-		height : '70dp',
-		borderWidth : 1,
-		zIndex : 9999,
+		height : HH,
 		backgroundColor : 'black',
-		bottom : '-20dp'
+		bottom : '-' + HH
 	});
 	var images = [];
 	for (var i = 0; i <= 16; i++)
@@ -28,70 +26,94 @@ var Radio = function() {
 	this.label = Ti.UI.createLabel({
 		color : 'white',
 		bottom : '2dp',
-		height : '20dp',
+		height : '16dp',
 		textAlign : 'center',
 		font : {
-			fontSize : '12dp'
+			fontSize : '10dp'
 		}
 	});
-	this.volumemeterbackground = Ti.UI.createImageView({
+
+	this.radiocontainer.add(Ti.UI.createImageView({
 		image : '/images/vumeter/tmp.png',
 		top : 0,
 		width : Ti.UI.FILL,
 		height : H
-	});
-	this.view.add(this.volumemmeter_background);
-	this.view.add(this.animatedvolumemeter);
-	this.view.add(this.label);
+	}));
+	this.radiocontainer.add(this.animatedvolumemeter);
+	this.radiocontainer.add(this.label);
 	this.audioPlayer = Ti.Media.createAudioPlayer({
 		allowBackground : true
+	});
+	var self = this;
+	this.audioPlayer.addEventListener('change', function(_e) {
+		switch (_e.description) {
+			case 'stopped':
+				self.animatedvolumemeter.stop();
+				self.animatedvolumemeter.setOpacity(0.1);
+			break;
+			case 'playing':
+				self.animatedvolumemeter.start();
+				self.animatedvolumemeter.setOpacity(1);
+			break; 
+		}
+	});
+	this.radiocontainer.addEventListener('click', function() {
+		if (self.audioPlayer.playing == true) {
+			self.audioPlayer.stop();
+			self.animatedvolumemeter.stop();
+			Ti.Android && self.audioPlayer.release();
+			self.radiocontainer.animate({
+				bottom : '-' + HH
+			});
+		}
 	});
 
 };
 
 Radio.prototype.getView = function() {
-	return this.view;
+	return this.radiocontainer;
 };
 
 Radio.prototype.togglePlay = function(_options) {
-	var m3u = _options.livestreamurl;
-	var name = _options.senderlongname;
+	var livestreamplaylisturl = _options.livestreamurl;
+	var senderlongname = _options.senderlongname;
+	if (senderlongname == this.last.name)
+		return;
 	if (this.audioPlayer.playing == true) {
 		Ti.Android && Ti.UI.createNotification({
 			message : 'Beende\n' + this.last.name
 		}).show();
 		this.audioPlayer.stop();
 		Ti.Android && this.audioPlayer.release();
-		this.animatedvolumemeter.setOpacity('0.1');
-		//	this.view.remove(this.animatedvolumemeter);
-		//	this.url = _m3u;
+		
+		//	this.radiocontainer.remove(this.animatedvolumemeter);
+		//	this.url = _livestreamplaylisturl;
 	}
-	if (this.last.url && this.last.url == m3u) {
-		this.view.animate({
-			bottom : '-' + H
+	if (this.last.url && this.last.url == livestreamplaylisturl) {
+		this.radiocontainer.animate({
+			bottom : '-' + HH
 		});
 		console.log('Info: same station ');
 
 	} else {
-		this.last.url = m3u;
-		this.last.name = name;
+		this.last.url = livestreamplaylisturl;
+		this.last.name = senderlongname;
 		console.log('Info: new station is fresh play/starting');
-		this.view.animate({
+		this.radiocontainer.animate({
 			bottom : 0
 		});
-		Ti.Android && Ti.UI.createNotification({
-			message : 'Verbinde mit\n' + name
-		}).show();
 		var self = this;
-		this.label.setText(name);
-		this.view.animate({
+		this.label.setText(senderlongname);
+		this.radiocontainer.animate({
 			bottom : 0
 		});
 		Ti.App.Model.getUrl({
-			m3u : m3u,
+			m3u : livestreamplaylisturl,
 			onload : function(_url) {
+				self.radiocontainer.animate({
+					bottom : 0
+				});
 				self.audioPlayer.setUrl(_url + '?' + Math.random());
-				self.animatedvolumemeter.setOpacity(1);
 				self.audioPlayer.play();
 			}
 		});
