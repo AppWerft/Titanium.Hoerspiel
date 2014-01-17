@@ -65,7 +65,7 @@ exports.create = function(_parent, _podcastlist) {
 			options : ['Jetzt hören', 'Vormerken', 'Speichern','Kanal abonnieren'],
 			selectedIndex : 3,
 			destructive : 0,
-			title :podcast.title
+			title :podcast.title  
 		};
 
 		var dialog = Ti.UI.createOptionDialog(opts);
