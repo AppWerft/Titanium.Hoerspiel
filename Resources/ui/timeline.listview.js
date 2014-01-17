@@ -7,9 +7,9 @@ exports.create = function(_parent) {
 		defaultItemTemplate : 'ptemplate',
 		backgroundColor : 'white'
 	});
+	var sections = [];
 	listView.update = function() {
 		var termine = Ti.App.Model.getSendungen();
-		var sections = [];
 		for (var s = 0; s < 3; s++) {
 			var sendungen = [];
 			if (termine[s])

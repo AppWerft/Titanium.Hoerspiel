@@ -62,6 +62,28 @@ Radio.prototype.importList = function() {
 	}
 };
 
+Radio.prototype.getDLRPodcasts = function() {
+	if (true == Ti.Network.online) {
+		var xhr = Ti.Network.createHTTPClient({
+			onload : function() {
+				var html = this.responseText;
+				var podcasts = [];
+				var regex = /<a\s.*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/gm;
+				var res = html.match(regex);
+				regex = /href="(.*?podcast\.xml)".*?>(.*?)<\/a>/m;
+				for (var i = 0; i < res.length; i++) {
+					podcasts.push({
+						feed : res[i].match(regex)[1],
+						title : res[i].match(regex)[2]
+					});
+				}
+			}
+		});
+		xhr.open('GET', 'http://www.deutschlandradio.de/podcasts.226.de.html', true);
+		xhr.send();
+	}
+};
+
 Radio.prototype.getStationGroups = function() {
 	return Ti.App.Properties.getList(RADIOLIST);
 };
@@ -76,7 +98,7 @@ Radio.prototype.getSendungen = function() {
 		if (mm < 10)
 			mm = '0' + mm;
 		var duration = res.fieldByName('stop') - res.fieldByName('start');
-		return { 
+		return {
 			livestreamurl : res.fieldByName('livestreamurl'),
 			start : hh + ':' + mm,
 			duration : duration,
@@ -110,7 +132,7 @@ Radio.prototype.getSendungen = function() {
 	wd = (wd + 1) % 7;
 	if (!wd)
 		wd = 7;
-	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
+	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' ORDER BY start';
 	var res = link.execute(q);
 	while (res.isValidRow()) {
 		termine[2].push(res2termin(res));

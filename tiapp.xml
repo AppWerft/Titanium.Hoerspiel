@@ -41,12 +41,9 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <!-- <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>-->
-        <manifest android:versionCode="6" android:versionName="1.6"
+        <manifest android:versionCode="8" android:versionName="1.8"
             package="de.appwerft.hoerspiel" xmlns:android="http://schemas.android.com/apk/res/android">
-            <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
             <uses-permission android:name="android.permission.INTERNET"/>
-            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
             <application>
                 <activity android:configChanges="keyboardHidden"
                     android:label=""

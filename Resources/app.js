@@ -9,29 +9,20 @@ var tabGroup = Ti.UI.createTabGroup({
 	navBarHidden : true
 });
 
-//
-// create base UI tab and root window
-//
-var win1 = Ti.UI.createWindow({
-	title : 'Stations'
-	
-});
+
 var tab1 = Ti.UI.createTab({
 	title : 'Stations',
 	window : require('ui/stations.window').create()
 });
 
-
-//
-// create controls tab and root window
-//
-var win2 = Ti.UI.createWindow({
-	title : 'Zeitleiste',
-	backgroundColor : '#fff'
-});
 var tab2 = Ti.UI.createTab({
 	title : 'Timeline',
 	window : require('ui/timeline.window').create()
+});
+
+var tab3 = Ti.UI.createTab({
+	title : 'Podcasts',
+	window : require('ui/podcasts.window').create()
 });
 
 
@@ -42,6 +33,8 @@ var tab2 = Ti.UI.createTab({
 //
 tabGroup.addTab(tab2);
 tabGroup.addTab(tab1);
+tabGroup.addTab(tab3);
+
 
 // open tab group
 tabGroup.open();

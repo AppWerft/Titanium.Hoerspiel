@@ -142,3 +142,21 @@ exports.listTemplate = {
 	}]
 };
 
+exports.podcastTemplate = {
+	properties : {
+		height : '50dip'
+	},
+	childTemplates : [{
+		type : 'Ti.UI.Label',
+		bindId : 'title',
+		properties : {
+			color : '#333',
+			font : {
+				fontFamily : 'Helvetica',
+				fontSize : '18dp',
+			},
+			left : '10dip',
+		}
+	}]
+};
+
