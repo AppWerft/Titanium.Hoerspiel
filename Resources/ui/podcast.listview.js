@@ -1,4 +1,16 @@
-exports.create = function(_parent, _data) {
+exports.create = function(_parent, _podcastlist) {
+
+	function cleanXML(foo) {
+		console.log( typeof foo);
+		switch (typeof foo) {
+			case 'string':
+				return foo;
+			case 'object':
+				return foo.text;
+			default:
+				return '';
+		}
+	};
 	var listView = Ti.UI.createListView({
 		templates : {
 			'template' : require('ui/templates').podcastTemplate
@@ -11,15 +23,10 @@ exports.create = function(_parent, _data) {
 	listView.podcastwidget = new PodCast();
 
 	setTimeout(function() {
-		Ti.App.Model.getPodcast(_data, function(_podcast) {
+		Ti.App.Model.getPodcast(_podcastlist, function(_podcasts) {
 			var items = [];
-			for (var i = 0; i < _podcast.channel.item.length; i++) {
-				var podcast = _podcast.channel.item[i];
-				var res = /src="(.*?)"/g.exec(podcast.description);
-				var moment = require('vendor/moment');
-				moment.lang('de');
-				var ctime = moment(podcast.pubDate).format('LLLL');
-
+			for (var i = 0; i < _podcasts.length; i++) {
+				var podcast = _podcasts[i];
 				items.push({
 					properties : {
 						itemId : JSON.stringify(podcast),
@@ -29,20 +36,21 @@ exports.create = function(_parent, _data) {
 						text : podcast.title
 					},
 					author : {
-						text : ( typeof podcast['itunes:author'] == 'string') ? podcast['itunes:author'] : podcast['itunes:author'].text
+						text : podcast.author
 					},
 					duration : {
-						text : 'Dauer: ' + ( typeof podcast['itunes:duration'] == 'string') ? podcast['itunes:duration'] : podcast['itunes:duration'].text
+						text : 'Dauer: ' + podcast.duration
 					},
 					pubdate : {
-						text : ctime
+						text : 'Sendezeit: ' + podcast.pubdate 
 					},
 					pict : {
-						image : (res) ? res[1] : '/images/'+_data.station + '.png'					}
+						image : podcast.pict
+					}
 				});
 			}
 			sections[0] = Ti.UI.createListSection({
-				headerTitle : _podcast.channel.image.title,
+				//headerTitle : _podcast.channel.image.title,
 				items : items
 			});
 			listView.setSections(sections);
@@ -50,7 +58,22 @@ exports.create = function(_parent, _data) {
 	}, 10);
 	_parent.add(listView.podcastwidget.getView());
 	listView.addEventListener('itemclick', function(e) {
-		listView.podcastwidget.togglePlay(JSON.parse(e.itemId));
+		var podcast = JSON.parse(e.itemId);
+		var state =Ti.App.Model.getMy(podcast);
+		var opts = {
+			cancel : 2,
+			options : ['Jetzt hören', 'Vormerken', 'Speichern','Kanal abonnieren'],
+			selectedIndex : 3,
+			destructive : 0,
+			title :podcast.title
+		};
+
+		var dialog = Ti.UI.createOptionDialog(opts);
+		dialog.show();
+		dialog.addEventListener('click', function(_evt) {
+			if (_evt.index == 0)
+				listView.podcastwidget.togglePlay(podcast);
+		});
 	});
 	_parent.addEventListener('close', function() {
 		listView.podcastwidget.close();

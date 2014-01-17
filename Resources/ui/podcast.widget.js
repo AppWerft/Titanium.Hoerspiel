@@ -76,7 +76,7 @@ PodCast.prototype.getView = function() {
 };
 
 PodCast.prototype.togglePlay = function(_options) {
-	var podcasturl = _options.enclosure.url;
+	var podcasturl = _options.url;
 	var podcasttitle = _options.title.substr(24) + '…';
 	if (podcasttitle == this.last.name)
 		return;
