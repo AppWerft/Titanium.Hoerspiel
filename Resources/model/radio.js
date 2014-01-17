@@ -61,22 +61,42 @@ Radio.prototype.importList = function() {
 		});
 	}
 };
+Radio.prototype.getPodcast = function(_podcast, _callback) {
+	if (true == Ti.Network.online) {
+		Ti.Android && Ti.UI.createNotification({
+			message : 'Retrieving podcast\n' + _podcast.title
+		}).show();
+		var xhr = Ti.Network.createHTTPClient({
+			onload : function() {
+				var XMLTools = require('vendor/XMLTools');
+				var podcast = (new XMLTools(this.responseText)).toObject();
+				_callback(podcast);
+			}
+		});
+		xhr.open('GET', _podcast.feed, true);
+		xhr.send();
+	}
+};
 
-Radio.prototype.getDLRPodcasts = function() {
+Radio.prototype.getDLRPodcasts = function(_callback) {
 	if (true == Ti.Network.online) {
 		var xhr = Ti.Network.createHTTPClient({
 			onload : function() {
 				var html = this.responseText;
 				var podcasts = [];
-				var regex = /<a\s.*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/gm;
+				var regex = /<a\sclass="(.*?)"\s.*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/gm;
 				var res = html.match(regex);
-				regex = /href="(.*?podcast\.xml)".*?>(.*?)<\/a>/m;
+				regex = /class="([a-z][a-z][a-z]).*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/m;
 				for (var i = 0; i < res.length; i++) {
+					
 					podcasts.push({
-						feed : res[i].match(regex)[1],
-						title : res[i].match(regex)[2]
+						station: res[i].match(regex)[1],
+						feed : res[i].match(regex)[2],
+						title : res[i].match(regex)[3].replace(/&amp;/, '&')
 					});
+				
 				}
+				_callback(podcasts);
 			}
 		});
 		xhr.open('GET', 'http://www.deutschlandradio.de/podcasts.226.de.html', true);

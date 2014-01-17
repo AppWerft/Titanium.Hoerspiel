@@ -5,7 +5,7 @@ for (var i = 0; i <= 16; i++)
 exports.timelineactiveTemplate = {
 	properties : {
 		height : '100dip'
-		
+
 	},
 	childTemplates : [{
 		type : 'Ti.UI.ImageView',
@@ -142,7 +142,7 @@ exports.listTemplate = {
 	}]
 };
 
-exports.podcastTemplate = {
+exports.podcastsTemplate = {
 	properties : {
 		height : '50dip'
 	},
@@ -155,8 +155,99 @@ exports.podcastTemplate = {
 				fontFamily : 'Helvetica',
 				fontSize : '18dp',
 			},
-			left : '10dip',
+			left : '60dip',
+		}
+	}, {
+		type : 'Ti.UI.ImageView',
+		bindId : 'logo',
+		properties : {
+			width : '50dp',
+			
+			height : '50dp',
+			left : '0dp'
 		}
 	}]
 };
 
+exports.podcastTemplate = {
+	properties : {
+		height : Ti.UI.SIZE
+	},
+	childTemplates : [{
+		type : 'Ti.UI.ImageView',
+		bindId : 'pict',
+		properties : {
+			width : '70dip',
+			height : '70dip',
+			top : 0,
+			left : 0
+		}
+	}, {
+		type : 'Ti.UI.View',
+		properties : {
+			layout : 'vertical',
+			top : 0,
+			left : 0
+		},
+		childTemplates : [{
+			type : 'Ti.UI.Label',
+			bindId : 'title',
+			properties : {
+				color : '#666',
+				top : '5dp',
+				font : {
+					fontFamily : 'Helvetica',
+					fontSize : '18dp',
+					fontWeight : 'bold'
+				},
+				left : '80dip',
+				right : '30dp',
+				height : Ti.UI.SIZE
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'author',
+			properties : {
+				color : '#333',
+				top : '9dp',
+				height : Ti.UI.SIZE,
+				font : {
+					fontFamily : 'Helvetica',
+					fontSize : '14dp',
+				},
+				left : '80dip',
+				right : '30dp',
+				height : Ti.UI.SIZE
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'pubdate',
+			properties : {
+				color : '#333',
+				top : '2dp',
+				font : {
+					fontFamily : 'Helvetica',
+					fontSize : '12dp',
+				},
+				left : '80dip',
+				height : Ti.UI.SIZE,
+				right : '30dp',
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'duration',
+			properties : {
+				color : '#333',
+				top : '0dp',
+				font : {
+					fontFamily : 'Helvetica',
+					fontSize : '12dp',
+				},
+				left : '80dip',
+				height : Ti.UI.SIZE,
+				right : '30dp',
+				bottom : '5dp'
+			}
+		}]
+	}]
+};

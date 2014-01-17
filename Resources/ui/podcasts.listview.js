@@ -1,7 +1,7 @@
 exports.create = function() {
 	var listView = Ti.UI.createListView({
 		templates : {
-			'template' : require('ui/templates').podcastTemplate
+			'template' : require('ui/templates').podcastsTemplate
 		},
 		defaultItemTemplate : 'template',
 		backgroundColor : 'white'
@@ -18,6 +18,9 @@ exports.create = function() {
 				},
 				title : {
 					text : podcast.title
+				},
+				logo : {
+					image : '/images/' + podcast.station +'.png'
 				}
 			});
 		}
@@ -28,7 +31,7 @@ exports.create = function() {
 		listView.setSections(sections);
 	});
 	listView.addEventListener('itemclick', function(e) {
-		var win = require('ui/sender.window').create(JSON.parse(e.itemId));
+		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
 		if (Ti.Android)
 			win.open();
 		else
