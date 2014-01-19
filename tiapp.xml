@@ -40,35 +40,23 @@
         </plist>
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
-        <!-- <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>-->
-        <manifest android:versionCode="10" android:versionName="1.10"
+        <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>
+        <manifest android:versionCode="12" android:versionName="1.12"
             package="de.appwerft.hoerspiel" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.INTERNET"/>
-            <application>
-                <activity android:configChanges="keyboardHidden"
-                    android:label=""
-                    android:name="ti.modules.titanium.media.TiVideoActivity"
-                    android:screenOrientation="landscape" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+            <application android:largeHeap="true">
                 <activity android:configChanges="keyboardHidden"
                     android:name="org.appcelerator.titanium.TiActivity"
                     android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
                 <activity android:configChanges="keyboardHidden"
                     android:name="org.appcelerator.titanium.TiTranslucentActivity"
                     android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
-                <activity android:configChanges="keyboardHidden"
-                    android:name="org.appcelerator.titanium.TiModalActivity"
-                    android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
-                <activity android:configChanges="keyboardHidden"
-                    android:name="ti.modules.titanium.ui.TiTabActivity"
-                    android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
                 <activity android:name="ti.modules.titanium.ui.android.TiPreferencesActivity"/>
                 <service android:exported="false" android:name="org.appcelerator.titanium.analytics.TiAnalyticsService"/>
                 <activity android:configChanges="keyboardHidden"
                     android:name="ti.modules.titanium.ui.TiTabActivity"
                     android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
-                <!--<activity android:configChanges="keyboardHidden"
-				android:name="org.appcelerator.titanium.TiActivity" android:screenOrientation="portrait"/>-->
-            </application>
+           </application>
         </manifest>
     </android>
     <mobileweb>

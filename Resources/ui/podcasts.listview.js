@@ -6,7 +6,45 @@ exports.create = function() {
 		defaultItemTemplate : 'template',
 		backgroundColor : 'white'
 	});
-	var sections = [];
+	var sections = [], items = [];
+	var wdr = [{
+		feed : 'http://podcast.wdr.de/radio/hoerspiel.xml',
+		title : 'Hörspiele im WDR'
+	}, {
+		feed : 'http://podcast.wdr.de/radio/leonardo.xml',
+		title : 'Leonardo im WDR'
+	}, {
+		feed : 'http://podcast.wdr.de/radio/baerenbude.xml',
+		title : 'Bärenbude – Kinderprogramm'
+	}, {
+		feed : 'http://podcast.wdr.de/radio/zeitzeichen.xml',
+		title : 'Zeitzeichen'
+	}, {
+		feed : 'http://podcast.wdr.de/radio/philosophischesradio.xml',
+		title : 'Das philosophische Radio'
+	}];
+	for (var i = 0; i < wdr.length; i++) {
+		items.push({
+			properties : {
+				itemId : JSON.stringify({
+					feed : wdr[i].feed,
+					title : wdr[i].title,
+					station : 'wdr'
+				}),
+				accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+			},
+			title : {
+				text : wdr[i].title,
+			},
+			logo : {
+				image : '/images/wdr.png'
+			}
+		});
+	}
+	sections[0] = Ti.UI.createListSection({
+		headerTitle : 'Westdeutscher Rundfunk',
+		items : items
+	});
 	Ti.App.Model.getDLRPodcasts(function(_podcasts) {
 		var items = [];
 		for (var i = 0; i < _podcasts.length; i++) {
@@ -20,11 +58,11 @@ exports.create = function() {
 					text : podcast.title
 				},
 				logo : {
-					image : '/images/' + podcast.station +'.png'
+					image : '/images/' + podcast.station + '.png'
 				}
 			});
 		}
-		sections[0] = Ti.UI.createListSection({
+		sections[1] = Ti.UI.createListSection({
 			headerTitle : 'DeutschlandRadio',
 			items : items
 		});

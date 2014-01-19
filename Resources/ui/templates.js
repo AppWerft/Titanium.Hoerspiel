@@ -4,7 +4,8 @@ for (var i = 0; i <= 16; i++)
 
 exports.timelineactiveTemplate = {
 	properties : {
-		height : '100dip'
+		height : '100dip',
+		backgroundImage : 'white'
 
 	},
 	childTemplates : [{
@@ -154,6 +155,7 @@ exports.podcastsTemplate = {
 			font : {
 				fontFamily : 'Helvetica',
 				fontSize : '18dp',
+				fontWeight : 'bold'
 			},
 			left : '60dip',
 		}
@@ -162,7 +164,7 @@ exports.podcastsTemplate = {
 		bindId : 'logo',
 		properties : {
 			width : '50dp',
-			
+
 			height : '50dp',
 			left : '0dp'
 		}
@@ -206,10 +208,25 @@ exports.podcastTemplate = {
 			}
 		}, {
 			type : 'Ti.UI.Label',
+			bindId : 'summary',
+			properties : {
+				color : '#333',
+				top : 0,
+				height : Ti.UI.SIZE,
+				font : {
+					fontFamily : 'Helvetica',
+					fontSize : '14dp',
+				},
+				left : '80dip',
+				right : '30dp',
+				height : Ti.UI.SIZE
+			}
+		}, {
+			type : 'Ti.UI.Label',
 			bindId : 'author',
 			properties : {
 				color : '#333',
-				top : '9dp',
+				top : 0,
 				height : Ti.UI.SIZE,
 				font : {
 					fontFamily : 'Helvetica',
@@ -227,7 +244,7 @@ exports.podcastTemplate = {
 				top : '2dp',
 				font : {
 					fontFamily : 'Helvetica',
-					fontSize : '12dp',
+					fontSize : '10dp',
 				},
 				left : '80dip',
 				height : Ti.UI.SIZE,
