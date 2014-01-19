@@ -61,6 +61,9 @@ exports.create = function() {
 				title : {
 					text : podcast.title
 				},
+				summary : {
+					text : podcast.summary
+				},
 				logo : {
 					image : '/images/dw.png'
 				}
@@ -72,11 +75,16 @@ exports.create = function() {
 
 	Ti.App.Model.getDLRPodcasts(function(_podcasts) {
 		var stations = ['dlf', 'drk', 'drw'];
-		for (var station = 0; station < stations.length; station++) {
-			var items = [];
+		var items = {
+			dlf : [],
+			drk : [],
+			drw : []
+		};
+		for (var s = 0; s < stations.length; s++) {
+			var station = stations[s];	
 			for (var i = 0; i < _podcasts[station].length; i++) {
 				var podcast = _podcasts[station][i];
-				items.push({
+				items[station].push({
 					properties : {
 						itemId : JSON.stringify(podcast),
 						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
@@ -92,15 +100,15 @@ exports.create = function() {
 		}
 		sections[2] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandfunk Köln',
-			items : podcast.dlf
+			items :items.dlf
 		});
 		sections[3] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandradio Kultur',
-			items : podcast.drk
+			items : items.drk
 		});
 		sections[4] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandradio Wissen',
-			items : podcast.drw
+			items : items.drw
 		});
 		listView.setSections(sections);
 
@@ -115,6 +123,7 @@ exports.create = function() {
 	listView.addEventListener('scrollto', function(_e) {
 		if (_e.ndx < 6) {
 			listView.scrollToItem(_e.ndx, 0);
+			listView.scrollToItem(_e.ndx, 10);
 		}
 	});
 	return listView;

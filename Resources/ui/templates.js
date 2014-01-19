@@ -168,6 +168,22 @@ exports.podcastsTemplate = {
 			height : '50dp',
 			left : '0dp'
 		}
+	}, {
+		type : 'Ti.UI.Label',
+		bindId : 'summary',
+		properties : {
+			color : '#333',
+			font : {
+				fontFamily : 'Helvetica',
+				fontSize : '14dp',
+
+			},
+			height : Ti.UI.SIZE,
+			top : '60dp',
+			right : '10dp',
+			bottom : '5dp',
+			left : '10dip',
+		}
 	}]
 };
 

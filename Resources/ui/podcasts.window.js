@@ -4,7 +4,7 @@ exports.create = function(_sender) {
 		backgroundColor : 'white',
 		layout : 'vertical'
 	});
-	var stations = ['wdr', 'dw', 'dlf', 'drk', 'drw', 'ndr', 'hr'];
+	var stations = ['wdr', 'dw', 'dlf', 'drk', 'drw', 'ndr', 'hr','mdr','br'];
 	var width = stations.length * W + 'dp';
 	var stationsview = Ti.UI.createScrollView({
 		width : Ti.UI.FILL,
@@ -17,7 +17,6 @@ exports.create = function(_sender) {
 		top : 0,
 		layout : 'horizontal'
 	});
-	var stations = ['wdr', 'dw', 'dlf', 'drk', 'drw', 'ndr', 'hr'];
 	for (var i = 0; i < stations.length; i++) {
 		stationsview.add(Ti.UI.createImageView({
 			image : '/images/' + stations[i] + '.png',
