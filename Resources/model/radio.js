@@ -1,4 +1,4 @@
-const RADIOLIST = 'RadioList';
+const RADIOLIST = 'RadioListandFavs';
 String.prototype.trim = function() {
 	return this.replace(/^\s+|\s+$/g, "");
 };
@@ -27,6 +27,7 @@ var Radio = function() {
 
 Radio.prototype.favMy = function(_args) {
 	var id = Ti.Utils.md5HexDigest(_args.url);
+	var link = Ti.Database.open(RADIOLIST);
 	var res = link.execute('SELECT count(*) as total FROM my WHERE id=?', id);
 	var now = (new Date).getTime();
 	if (res.isValidRow())
@@ -35,7 +36,9 @@ Radio.prototype.favMy = function(_args) {
 		link.execute('UDATE my SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.meta));
 	else
 		link.execute('INSERT INTO my VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.meta), now, now, 0, 1, 0);
+	link.close();
 	_args.onload && (_args.onload(true));
+	
 
 };
 Radio.prototype.saveMy = function(_args) {
@@ -52,6 +55,7 @@ Radio.prototype.saveMy = function(_args) {
 				link.execute('UDATE my SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.meta));
 			else
 				link.execute('INSERT INTO my VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.meta), now, now, 0, 1, 0);
+			link.close();
 			_args.onload && (_args.onload(true));
 		},
 		ondatastream : function(_e) {
@@ -207,85 +211,6 @@ Radio.prototype.getPodcast = function(_args) {
 	}
 };
 
-Radio.prototype.getDLRPodcasts = function(_callback) {
-	if (Ti.App.Properties.hasProperty('drlist'))
-		_callback(Ti.App.Properties.getObject('dlrlist'));
-	if (true == Ti.Network.online) {
-		var xhr = Ti.Network.createHTTPClient({
-			onload : function() {
-				var html = this.responseText;
-				var podcasts = {
-					dlf : [],
-					drk : [],
-					drw : []
-				};
-				var regex = /<a\sclass="(.*?)"\s.*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/gm;
-				var res = html.match(regex);
-				regex = /class="([a-z][a-z][a-z]).*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/m;
-				for (var i = 0; i < res.length; i++) {
-					var station = res[i].match(regex)[1];
-					try {
-						podcasts[station].push({
-							station : station,
-							feed : res[i].match(regex)[2],
-							title : res[i].match(regex)[3].replace(/&amp;/, '&')
-						});
-					} catch(E) {
-						console.log(E);
-					}
-
-				}
-				Ti.App.Properties.setObject('dlrlist', podcasts);
-				_callback(podcasts);
-			}
-		});
-		xhr.open('GET', 'http://www.deutschlandradio.de/podcasts.226.de.html', true);
-		xhr.send();
-	}
-};
-Radio.prototype.getDWPodcasts = function(_callback) {
-	if (Ti.App.Properties.hasProperty('dwlist'))
-		_callback(Ti.App.Properties.getList('dwlist'));
-	if (true == Ti.Network.online) {
-		var yql = 'SELECT * FROM html WHERE url="http://mediacenter.dw.de/german/podcasts/" and xpath="//div[contains(@class,\'news\') and contains(@class,\'minHeight\')]"';
-		Ti.Yahoo.yql(yql, function(e) {
-			if (e.success) {
-				var feeds = [];
-				for (var i = 0; i < e.data.div.length; i++) {
-					var feed = e.data.div[i];
-					feeds.push({
-						feed : feed.a.href,
-						station : 'dw',
-						title : feed.h2.content.trim(),
-						summary : feed.p
-					});
-				}
-				_callback(feeds);
-			}
-
-			/*"div": {
-			 "class": "teaserImg",
-			 "img": {
-			 "alt": "People packed together in the back of a pick-up ",
-			 "border": "0",
-			 "height": "124",
-			 "src": "http://www.dw.de/image/0,,15682314_301,00.jpg",
-			 "width": "220"
-			 }
-			 },
-			 "h2": {
-			 "class": "linkable",
-			 "content": "Shift"
-			 },
-			 "p": "Das Web-Magazin berichtet über aktuelle Entwicklungen der Netzkultur und zeigt bemerkenswerte Webangebote von Usern und Profis."
-			 },*/
-			if (e.success) {
-				var rss = e.data;
-				//		console.log(rss);
-			}
-		});
-	}
-};
 Radio.prototype.getStationGroups = function() {
 	return Ti.App.Properties.getList(RADIOLIST);
 };

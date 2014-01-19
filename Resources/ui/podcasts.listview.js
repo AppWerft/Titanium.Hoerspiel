@@ -1,4 +1,5 @@
 exports.create = function() {
+	var PodCasts = require('model/podcasts');
 	var listView = Ti.UI.createListView({
 		top : 0,
 		templates : {
@@ -8,22 +9,7 @@ exports.create = function() {
 		backgroundColor : 'white'
 	});
 	var sections = [], items = [];
-	var wdr = [{
-		feed : 'http://podcast.wdr.de/radio/hoerspiel.xml',
-		title : 'Hörspiele im WDR'
-	}, {
-		feed : 'http://podcast.wdr.de/radio/leonardo.xml',
-		title : 'Leonardo im WDR'
-	}, {
-		feed : 'http://podcast.wdr.de/radio/baerenbude.xml',
-		title : 'Bärenbude – Kinderprogramm'
-	}, {
-		feed : 'http://podcast.wdr.de/radio/zeitzeichen.xml',
-		title : 'Zeitzeichen'
-	}, {
-		feed : 'http://podcast.wdr.de/radio/philosophischesradio.xml',
-		title : 'Das philosophische Radio'
-	}];
+	var wdr = PodCasts.getWDRPodcasts();
 	for (var i = 0; i < wdr.length; i++) {
 		items.push({
 			properties : {
@@ -49,7 +35,7 @@ exports.create = function() {
 	sections[1] = Ti.UI.createListSection({
 		headerTitle : 'Deutsche Welle',
 	});
-	Ti.App.Model.getDWPodcasts(function(_podcasts) {
+	PodCasts.getDWPodcasts(function(_podcasts) {
 		var items = [];
 		for (var i = 0; i < _podcasts.length; i++) {
 			var podcast = _podcasts[i];
@@ -73,7 +59,7 @@ exports.create = function() {
 		listView.setSections(sections);
 	});
 
-	Ti.App.Model.getDLRPodcasts(function(_podcasts) {
+	PodCasts.getDLRPodcasts(function(_podcasts) {
 		var stations = ['dlf', 'drk', 'drw'];
 		var items = {
 			dlf : [],
@@ -81,7 +67,7 @@ exports.create = function() {
 			drw : []
 		};
 		for (var s = 0; s < stations.length; s++) {
-			var station = stations[s];	
+			var station = stations[s];
 			for (var i = 0; i < _podcasts[station].length; i++) {
 				var podcast = _podcasts[station][i];
 				items[station].push({
@@ -100,7 +86,7 @@ exports.create = function() {
 		}
 		sections[2] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandfunk Köln',
-			items :items.dlf
+			items : items.dlf
 		});
 		sections[3] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandradio Kultur',
@@ -111,7 +97,6 @@ exports.create = function() {
 			items : items.drw
 		});
 		listView.setSections(sections);
-
 	});
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
