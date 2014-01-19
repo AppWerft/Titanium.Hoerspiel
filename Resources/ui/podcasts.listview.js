@@ -1,5 +1,6 @@
 exports.create = function() {
 	var listView = Ti.UI.createListView({
+		top : 0,
 		templates : {
 			'template' : require('ui/templates').podcastsTemplate
 		},
@@ -45,7 +46,10 @@ exports.create = function() {
 		headerTitle : 'Westdeutscher Rundfunk',
 		items : items
 	});
-	Ti.App.Model.getDLRPodcasts(function(_podcasts) {
+	sections[1] = Ti.UI.createListSection({
+		headerTitle : 'Deutsche Welle',
+	});
+	Ti.App.Model.getDWPodcasts(function(_podcasts) {
 		var items = [];
 		for (var i = 0; i < _podcasts.length; i++) {
 			var podcast = _podcasts[i];
@@ -58,15 +62,48 @@ exports.create = function() {
 					text : podcast.title
 				},
 				logo : {
-					image : '/images/' + podcast.station + '.png'
+					image : '/images/dw.png'
 				}
 			});
 		}
-		sections[1] = Ti.UI.createListSection({
-			headerTitle : 'DeutschlandRadio',
-			items : items
+		sections[1].setItems(items);
+		listView.setSections(sections);
+	});
+
+	Ti.App.Model.getDLRPodcasts(function(_podcasts) {
+		var stations = ['dlf', 'drk', 'drw'];
+		for (var station = 0; station < stations.length; station++) {
+			var items = [];
+			for (var i = 0; i < _podcasts[station].length; i++) {
+				var podcast = _podcasts[station][i];
+				items.push({
+					properties : {
+						itemId : JSON.stringify(podcast),
+						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+					},
+					title : {
+						text : podcast.title
+					},
+					logo : {
+						image : '/images/' + station + '.png'
+					}
+				});
+			}
+		}
+		sections[2] = Ti.UI.createListSection({
+			headerTitle : 'Deutschlandfunk Köln',
+			items : podcast.dlf
+		});
+		sections[3] = Ti.UI.createListSection({
+			headerTitle : 'Deutschlandradio Kultur',
+			items : podcast.drk
+		});
+		sections[4] = Ti.UI.createListSection({
+			headerTitle : 'Deutschlandradio Wissen',
+			items : podcast.drw
 		});
 		listView.setSections(sections);
+
 	});
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
@@ -74,6 +111,11 @@ exports.create = function() {
 			win.open();
 		else
 			self.tab.open(win);
+	});
+	listView.addEventListener('scrollto', function(_e) {
+		if (_e.ndx < 6) {
+			listView.scrollToItem(_e.ndx, 0);
+		}
 	});
 	return listView;
 };

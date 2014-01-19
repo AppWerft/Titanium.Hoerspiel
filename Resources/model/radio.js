@@ -1,4 +1,13 @@
 const RADIOLIST = 'RadioList';
+String.prototype.trim = function() {
+	return this.replace(/^\s+|\s+$/g, "");
+};
+String.prototype.ltrim = function() {
+	return this.replace(/^\s+/, "");
+};
+String.prototype.rtrim = function() {
+	return this.replace(/\s+$/, "");
+};
 function cleanXML(foo) {
 	console.log( typeof foo);
 	switch (typeof foo) {
@@ -13,7 +22,6 @@ function cleanXML(foo) {
 
 var Radio = function() {
 	this.importList();
-	this.getDWPodcasts();
 	return this;
 };
 
@@ -172,7 +180,6 @@ Radio.prototype.getPodcast = function(_args) {
 						var text = /<img .*?>(.*?)</g.exec(description);
 						if (text) {
 							summary = text[1];
-							console.log(summary);
 						}
 					}
 					var enclosure = item.getElementsByTagName("enclosure");
@@ -187,7 +194,7 @@ Radio.prototype.getPodcast = function(_args) {
 						pubdate : pubdate,
 						station : _args.podcastlist.station,
 						media : media,
-						summary : summary,
+						summary : (summary) ? summary.trim() : null,
 						pict : (res) ? res[1] : '/images/' + _args.podcastlist.station + '.png'
 					});
 				}
@@ -202,25 +209,33 @@ Radio.prototype.getPodcast = function(_args) {
 
 Radio.prototype.getDLRPodcasts = function(_callback) {
 	if (Ti.App.Properties.hasProperty('drlist'))
-		_callback(Ti.App.Properties.getList('dlrlist'));
+		_callback(Ti.App.Properties.getObject('dlrlist'));
 	if (true == Ti.Network.online) {
 		var xhr = Ti.Network.createHTTPClient({
 			onload : function() {
 				var html = this.responseText;
-				var podcasts = [];
+				var podcasts = {
+					dlf : [],
+					drk : [],
+					drw : []
+				};
 				var regex = /<a\sclass="(.*?)"\s.*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/gm;
 				var res = html.match(regex);
 				regex = /class="([a-z][a-z][a-z]).*?href="(.*?podcast\.xml)".*?>(.*?)<\/a>/m;
 				for (var i = 0; i < res.length; i++) {
-
-					podcasts.push({
-						station : res[i].match(regex)[1],
-						feed : res[i].match(regex)[2],
-						title : res[i].match(regex)[3].replace(/&amp;/, '&')
-					});
+					var station = res[i].match(regex)[1];
+					try {
+						podcasts[station].push({
+							station : station,
+							feed : res[i].match(regex)[2],
+							title : res[i].match(regex)[3].replace(/&amp;/, '&')
+						});
+					} catch(E) {
+						console.log(E);
+					}
 
 				}
-				Ti.App.Properties.setList('dlrlist', podcasts);
+				Ti.App.Properties.setObject('dlrlist', podcasts);
 				_callback(podcasts);
 			}
 		});
@@ -234,31 +249,39 @@ Radio.prototype.getDWPodcasts = function(_callback) {
 	if (true == Ti.Network.online) {
 		var yql = 'SELECT * FROM html WHERE url="http://mediacenter.dw.de/german/podcasts/" and xpath="//div[contains(@class,\'news\') and contains(@class,\'minHeight\')]"';
 		Ti.Yahoo.yql(yql, function(e) {
-			
 			if (e.success) {
-				var feeds = e.data.div;
-				console.log(feeds);
+				var feeds = [];
+				for (var i = 0; i < e.data.div.length; i++) {
+					var feed = e.data.div[i];
+					feeds.push({
+						feed : feed.a.href,
+						station : 'dw',
+						title : feed.h2.content.trim(),
+						summary : feed.p
+					});
+				}
+				_callback(feeds);
 			}
-			
+
 			/*"div": {
-      "class": "teaserImg",
-      "img": {
-       "alt": "People packed together in the back of a pick-up ",
-       "border": "0",
-       "height": "124",
-       "src": "http://www.dw.de/image/0,,15682314_301,00.jpg",
-       "width": "220"
-      }
-     },
-     "h2": {
-      "class": "linkable",
-      "content": "Shift"
-     },
-     "p": "Das Web-Magazin berichtet über aktuelle Entwicklungen der Netzkultur und zeigt bemerkenswerte Webangebote von Usern und Profis."
-    },*/
+			 "class": "teaserImg",
+			 "img": {
+			 "alt": "People packed together in the back of a pick-up ",
+			 "border": "0",
+			 "height": "124",
+			 "src": "http://www.dw.de/image/0,,15682314_301,00.jpg",
+			 "width": "220"
+			 }
+			 },
+			 "h2": {
+			 "class": "linkable",
+			 "content": "Shift"
+			 },
+			 "p": "Das Web-Magazin berichtet über aktuelle Entwicklungen der Netzkultur und zeigt bemerkenswerte Webangebote von Usern und Profis."
+			 },*/
 			if (e.success) {
 				var rss = e.data;
-				console.log(rss);
+				//		console.log(rss);
 			}
 		});
 	}
@@ -268,7 +291,7 @@ Radio.prototype.getStationGroups = function() {
 };
 
 Radio.prototype.getSendungen = function() {
-	console.log('Info: try to open ' + RADIOLIST);
+	//	console.log('Info: try to open ' + RADIOLIST);
 	var moment = require('vendor/moment');
 	var now = parseInt(moment().format('HH')) * 60 + parseInt(moment().format('m'));
 	function res2termin(res) {
@@ -294,12 +317,15 @@ Radio.prototype.getSendungen = function() {
 		return [[], [], []];
 	}
 	var stop = parseInt(moment().format('H') * 60) + parseInt(moment().format('m'));
-	var wd = moment().format('d');
+	var wd = moment().format('e');
+	if (wd == 0)
+		wd = 7;
 	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
 	var res = link.execute(q);
 	var termine = [[], [], []];
 	while (res.isValidRow()) {
 		termin = res2termin(res);
+		//	console.log(termin);
 		if (now >= res.fieldByName('start'))
 			termine[0].push(termin);
 		else {
@@ -308,10 +334,7 @@ Radio.prototype.getSendungen = function() {
 		res.next();
 	}
 	res.close();
-	wd = (wd + 1) % 7;
-	if (!wd)
-		wd = 7;
-	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' ORDER BY start';
+	var q = 'SELECT termine.*, sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' ORDER BY start';
 	var res = link.execute(q);
 	while (res.isValidRow()) {
 		termine[2].push(res2termin(res));

@@ -71,7 +71,7 @@ exports.create = function(_parent, _podcastlist) {
 		console.log(podcast);
 		//var state = Ti.App.Model.getMy(podcast);
 		var opts = {
-			cancel : 2,
+			cancel : 3,
 			options : ['Jetzt hören', 'Vormerken', 'Speichern', 'Kanal abonnieren'],
 			selectedIndex : 3,
 			destructive : 0,
@@ -83,6 +83,10 @@ exports.create = function(_parent, _podcastlist) {
 		dialog.addEventListener('click', function(_evt) {
 			if (_evt.index == 0)
 				listView.podcastwidget.togglePlay(podcast);
+			else
+				Ti.UI.createNotification({
+					message : 'Das ist noch nicht realisiert,'
+				}).show();
 		});
 	});
 	_parent.addEventListener('close', function() {

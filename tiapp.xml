@@ -41,7 +41,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="19"/>
-        <manifest android:versionCode="12" android:versionName="1.12"
+        <manifest android:versionCode="15" android:versionName="1.15"
             package="de.appwerft.hoerspiel" xmlns:android="http://schemas.android.com/apk/res/android">
             <uses-permission android:name="android.permission.INTERNET"/>
             <application android:largeHeap="true">
