@@ -1,5 +1,5 @@
 exports.create = function() {
-	var PodCasts = require('model/podcasts');
+	
 	var listView = Ti.UI.createListView({
 		top : 0,
 		templates : {
@@ -9,7 +9,7 @@ exports.create = function() {
 		backgroundColor : 'white'
 	});
 	var sections = [], items = [];
-	var wdr = PodCasts.getWDRPodcasts();
+	var wdr = require('model/podcasts/wdr').list;
 	for (var i = 0; i < wdr.length; i++) {
 		items.push({
 			properties : {
@@ -35,7 +35,7 @@ exports.create = function() {
 	sections[1] = Ti.UI.createListSection({
 		headerTitle : 'Deutsche Welle',
 	});
-	PodCasts.getDWPodcasts(function(_podcasts) {
+	require('model/podcasts/dw').get(function(_podcasts) {
 		var items = [];
 		for (var i = 0; i < _podcasts.length; i++) {
 			var podcast = _podcasts[i];
@@ -59,7 +59,7 @@ exports.create = function() {
 		listView.setSections(sections);
 	});
 
-	PodCasts.getDLRPodcasts(function(_podcasts) {
+	require('model/podcasts/dlr').get(function(_podcasts) {
 		var stations = ['dlf', 'drk', 'drw'];
 		var items = {
 			dlf : [],
