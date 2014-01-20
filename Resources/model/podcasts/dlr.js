@@ -1,4 +1,4 @@
-exports.get= function(_callback) {
+exports.get = function(_callback) {
 	if (Ti.App.Properties.hasProperty('drlist'))
 		_callback(Ti.App.Properties.getObject('dlrlist'));
 	if (true == Ti.Network.online) {
@@ -34,5 +34,4 @@ exports.get= function(_callback) {
 		xhr.send();
 	}
 };
-
 

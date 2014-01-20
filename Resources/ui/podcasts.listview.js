@@ -1,41 +1,5 @@
 exports.create = function() {
-	
-	var listView = Ti.UI.createListView({
-		top : 0,
-		templates : {
-			'template' : require('ui/templates').podcastsTemplate
-		},
-		defaultItemTemplate : 'template',
-		backgroundColor : 'white'
-	});
-	var sections = [], items = [];
-	var wdr = require('model/podcasts/wdr').list;
-	for (var i = 0; i < wdr.length; i++) {
-		items.push({
-			properties : {
-				itemId : JSON.stringify({
-					feed : wdr[i].feed,
-					title : wdr[i].title,
-					station : 'wdr'
-				}),
-				accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-			},
-			title : {
-				text : wdr[i].title,
-			},
-			logo : {
-				image : '/images/wdr.png'
-			}
-		});
-	}
-	sections[0] = Ti.UI.createListSection({
-		headerTitle : 'Westdeutscher Rundfunk',
-		items : items
-	});
-	sections[1] = Ti.UI.createListSection({
-		headerTitle : 'Deutsche Welle',
-	});
-	require('model/podcasts/dw').get(function(_podcasts) {
+	function getItems(_podcasts, _station) {
 		var items = [];
 		for (var i = 0; i < _podcasts.length; i++) {
 			var podcast = _podcasts[i];
@@ -51,53 +15,60 @@ exports.create = function() {
 					text : podcast.summary
 				},
 				logo : {
-					image : '/images/dw.png'
+					image : (podcast.logo) ? podcast.logo: '/images/' + _station + '.png'
 				}
 			});
 		}
-		sections[1].setItems(items);
+		return items;
+	};
+	var listView = Ti.UI.createListView({
+		top : 0,
+		templates : {
+			'template' : require('ui/templates').podcastsTemplate
+		},
+		defaultItemTemplate : 'template',
+		backgroundColor : 'white'
+	});
+	var sections = [], items = [];
+
+	sections[0] = Ti.UI.createListSection({
+		headerTitle : 'Westdeutscher Rundfunk',
+		items : getItems(require('model/podcasts/wdr').list, 'wdr')
+	});
+	sections[1] = Ti.UI.createListSection({
+		headerTitle : 'Deutsche Welle',
+	});
+	require('model/podcasts/dw').get(function(_podcasts) {
+		sections[1].setItems(getItems(_podcasts, 'dw'));
 		listView.setSections(sections);
 	});
-
 	require('model/podcasts/dlr').get(function(_podcasts) {
-		var stations = ['dlf', 'drk', 'drw'];
-		var items = {
-			dlf : [],
-			drk : [],
-			drw : []
-		};
-		for (var s = 0; s < stations.length; s++) {
-			var station = stations[s];
-			for (var i = 0; i < _podcasts[station].length; i++) {
-				var podcast = _podcasts[station][i];
-				items[station].push({
-					properties : {
-						itemId : JSON.stringify(podcast),
-						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-					},
-					title : {
-						text : podcast.title
-					},
-					logo : {
-						image : '/images/' + station + '.png'
-					}
-				});
-			}
-		}
 		sections[2] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandfunk Köln',
-			items : items.dlf
+			items : getItems(_podcasts.dlf, 'dlf')
 		});
 		sections[3] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandradio Kultur',
-			items : items.drk
+			items : getItems(_podcasts.drk, 'drk')
 		});
 		sections[4] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandradio Wissen',
-			items : items.drw
-		});
+			items : getItems(_podcasts.drw, 'drw')
+			});
 		listView.setSections(sections);
 	});
+	sections[5] = Ti.UI.createListSection({
+		headerTitle : 'Schweizer Rundfunk 2 Kultur',
+	});
+	require('model/podcasts/srf2').get(function(_podcasts) {
+		sections[5].setItems(getItems(_podcasts, 'srf2'));
+		listView.setSections(sections);
+	});
+	sections[6] = Ti.UI.createListSection({
+		headerTitle : 'hr2 Kultur',
+	});
+	sections[6].setItems(getItems(require('model/podcasts/hr2').list, 'hr2kultur'));
+
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
 		if (Ti.Android)
@@ -106,7 +77,7 @@ exports.create = function() {
 			self.tab.open(win);
 	});
 	listView.addEventListener('scrollto', function(_e) {
-		if (_e.ndx < 6) {
+		if (_e.ndx < 8) {
 			listView.scrollToItem(_e.ndx, 0);
 			listView.scrollToItem(_e.ndx, 10);
 		}

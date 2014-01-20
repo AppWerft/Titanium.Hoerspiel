@@ -1,4 +1,4 @@
-const RADIOLIST = 'RadioListandFavs';
+const RADIOLIST = 'RadioListFavs';
 String.prototype.trim = function() {
 	return this.replace(/^\s+|\s+$/g, "");
 };
@@ -92,7 +92,7 @@ Radio.prototype.importList = function() {
 	var self = this;
 	function importIntoDB(groups) {
 		var link = Ti.Database.open(RADIOLIST);
-		link.execute('CREATE TABLE IF NOT EXISTS my (id TEXT, meta TEXT, ctime NUMERIC, mtime NUMERIC, count NUMERIC,	faved NUMERIC, cached NUMERIC)');
+		link.execute('CREATE TABLE IF NOT EXISTS my (id TEXT, podcast TEXT, ctime NUMERIC, mtime NUMERIC, count NUMERIC,	faved NUMERIC, cached NUMERIC)');
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
 		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
