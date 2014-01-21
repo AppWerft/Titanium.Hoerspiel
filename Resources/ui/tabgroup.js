@@ -1,17 +1,16 @@
 exports.create = function() {// this sets the background color of the master UIView (when there are no windows/tab groups on it)
 	var tabGroup = Ti.UI.createTabGroup({
-	//	fullscreen : true,
-		exitOnClose : true,
-		orientationModes : [Ti.UI.PORTRAIT]
+		fullscreen : true,
+		exitOnClose : true
 	});
 
 	var tab1 = Ti.UI.createTab({
-		title : 'Radio\nsender',
+		title : 'Radiosender',
 		window : require('ui/stations.window').create()
 	});
 
 	var tab2 = Ti.UI.createTab({
-		title : 'Nächste Hörspiele',
+		title : '>> Hörspiele',
 		window : require('ui/timeline.window').create()
 	});
 
@@ -32,8 +31,6 @@ exports.create = function() {// this sets the background color of the master UIV
 	tabGroup.addTab(tab1);
 	tabGroup.addTab(tab3);
 	tabGroup.addTab(tab4);
-
-	// open tab group
 
 	tabGroup.addEventListener('open', require('ui/actionbar_menu.widget'));
 	return tabGroup;
