@@ -8,17 +8,7 @@ String.prototype.ltrim = function() {
 String.prototype.rtrim = function() {
 	return this.replace(/\s+$/, "");
 };
-function cleanXML(foo) {
-	console.log( typeof foo);
-	switch (typeof foo) {
-		case 'string':
-			return foo;
-		case 'object':
-			return foo.text;
-		default:
-			return '';
-	}
-};
+
 
 var Radio = function() {
 	this.importList();
@@ -42,19 +32,20 @@ Radio.prototype.favMy = function(_args) {
 
 };
 Radio.prototype.saveMy = function(_args) {
+	var id = Ti.Utils.md5HexDigest(_args.podcast.media);
 	var xhr = Ti.Network.createHTTPClient({
 		onload : function() {
 			var link = Ti.Database.open(RADIOLIST);
-			var id = Ti.Utils.md5HexDigest(_args.url);
 			var fh = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, id) : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, id);
+			fh.write(this.responseData);
 			var res = link.execute('SELECT count(*) as total FROM my WHERE id=?', id);
 			var now = (new Date).getTime();
 			if (res.isValidRow())
 				var total = res.fieldByName('total');
 			if (total)
-				link.execute('UDATE my SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.meta));
+				link.execute('UDATE my SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.podcasts));
 			else
-				link.execute('INSERT INTO my VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.meta), now, now, 0, 1, 0);
+				link.execute('INSERT INTO my VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcasts), now, now, 0, 1, 0);
 			link.close();
 			_args.onload && (_args.onload(true));
 		},
@@ -62,7 +53,7 @@ Radio.prototype.saveMy = function(_args) {
 			_args.onprogress && _args.onprogress(_e.progress);
 		}
 	});
-	xhr.open('GET', _args.url);
+	xhr.open('GET', _args.podcast.media);
 	xhr.send();
 };
 

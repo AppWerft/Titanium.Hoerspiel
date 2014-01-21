@@ -8,15 +8,14 @@ exports.get = function(_callback) {
 		Ti.Yahoo.yql(yql, function(e) {
 			if (e.success) {
 				var feeds = [];
+				console.log(e.data);
 				for (var i = 0; i < e.data.li.length; i++) {
 					var feed = e.data.li[i];
-					var node = (isArray(feed.div.div)) ? feed.div.div[0] :feed.div.div;
+					var node = (isArray(feed.div.div)) ? feed.div.div[0] : feed.div.div;
 					try {
-					//	console.log(node.ul.li[0].div.input.value)
 						feeds.push({
 							feed : node.ul.li[0].div.input.value,
 							station : 'srf2',
-							logo : feed.a.img.src,
 							title : feed.div.h3.a.content,
 							summary : feed.div.p
 						});
@@ -29,6 +28,9 @@ exports.get = function(_callback) {
 			}
 		});
 	}
+
+	var x = '';
+
 	var example = {
 		"class" : "shows",
 		"div" : {

@@ -6,17 +6,18 @@ Ti.App.Model = new RadioModel();
 
 // create tab group
 var tabGroup = Ti.UI.createTabGroup({
-	navBarHidden : true
+	fullscreen : true,
+	exitOnClose : true,
+	orientationModes : [Ti.UI.PORTRAIT]
 });
 
-
 var tab1 = Ti.UI.createTab({
-	title : 'Stations',
+	title : 'Radio\nsender',
 	window : require('ui/stations.window').create()
 });
 
 var tab2 = Ti.UI.createTab({
-	title : 'Timeline',
+	title : 'Nächste Hörspiele',
 	window : require('ui/timeline.window').create()
 });
 
@@ -25,8 +26,10 @@ var tab3 = Ti.UI.createTab({
 	window : require('ui/podcasts.window').create()
 });
 
-
-
+var tab4 = Ti.UI.createTab({
+	title : 'Mein Radio',
+	window : require('ui/myradio.window').create()
+});
 
 //
 //  add tabs
@@ -34,7 +37,10 @@ var tab3 = Ti.UI.createTab({
 tabGroup.addTab(tab2);
 tabGroup.addTab(tab1);
 tabGroup.addTab(tab3);
-
+tabGroup.addTab(tab4);
 
 // open tab group
+
+tabGroup.addEventListener('open', require('ui/actionbar_menu.widget'));
+
 tabGroup.open();

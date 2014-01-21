@@ -20,7 +20,7 @@ var Radio = function() {
 		repeatCount : 0,
 		width : Ti.UI.FILL,
 		height : H,
-		duration : 123,
+		duration : 100,
 		opacity : 0.1
 	});
 	this.label = Ti.UI.createLabel({

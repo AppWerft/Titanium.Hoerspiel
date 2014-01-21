@@ -32,8 +32,8 @@ exports.create = function() {
 	var sections = [], items = [];
 
 	sections[0] = Ti.UI.createListSection({
-		headerTitle : 'Westdeutscher Rundfunk',
-		items : getItems(require('model/podcasts/wdr').list, 'wdr')
+		headerTitle : 'Hessischer Rundfunk 2',
+		items : getItems(require('model/podcasts/hr2').list, 'hr2')
 	});
 	sections[1] = Ti.UI.createListSection({
 		headerTitle : 'Deutsche Welle',
@@ -65,9 +65,9 @@ exports.create = function() {
 		listView.setSections(sections);
 	});
 	sections[6] = Ti.UI.createListSection({
-		headerTitle : 'hr2 Kultur',
+		headerTitle : 'Westdeutscher Rundfunk',
 	});
-	sections[6].setItems(getItems(require('model/podcasts/hr2').list, 'hr2kultur'));
+	sections[6].setItems(getItems(require('model/podcasts/wdr').list, 'wdr'));
 
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
