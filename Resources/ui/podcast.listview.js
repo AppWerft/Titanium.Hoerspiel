@@ -95,6 +95,7 @@ exports.create = function(_parent, _podcastlist) {
 						podcast : podcast,
 						onprogress : function(_p) {
 							listView.progressview.setProgress(_p);
+							listView.progressview.setMessage('schon da: ' + parseInt(_p*100) +'%');
 						},
 						onload : function(_p) {
 							listView.progressview.hide();

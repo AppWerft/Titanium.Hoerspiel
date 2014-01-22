@@ -14,34 +14,39 @@ exports.create = function() {
 		height : '100dp'
 	}));
 	self.container = Ti.UI.createView({
-		bottom : 0,
-		height : '80dp'
+		bottom : 0,left:'10dp',right:'10dp',
+		layout : 'vertical',
+		height : '100dp'
 	});
+	self.add(self.container);
 	self.title = Ti.UI.createLabel({
 		color : 'white',
 		top : '5dp',
+		height : '20dp',
 		font : {
 			fontWeight : 'bold',
-			fontSize : '20dp'
+			fontSize : '16dp'
 		}
 	});
+	self.container.add(self.title);
+	
+	self.progress = Ti.UI.createProgressBar({
+		width : '100%',
+		min : 0,
+		max : 1,
+		height : '30dp',
+		top : '5dp'
+	});
+	self.container.add(self.progress);
+	self.progress.show();
 	self.message = Ti.UI.createLabel({
 		color : 'white',
-		bottom : '5dp',
+		top : '10dp',textAlign:'left',
 		font : {
 			fontSize : '14dp'
 		}
 	});
-	self.container.add(self.title);
-	self.progress = Ti.UI.createProgressBar({
-		width : '90%',
-		min : 0,
-		max : 1,
-		height : '30dp',
-		bottom : '40dp'
-	});
-	self.add(self.progress);
-	self.progress.show();
+	self.container.add(self.message);
 	self.setProgress = function(e) {
 		self.progress.setValue(e);
 	};

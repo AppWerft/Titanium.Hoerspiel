@@ -1,4 +1,4 @@
-const RADIOLIST = 'RadioListFavs';
+const RADIOLIST = 'RadioListFavsSaves';
 String.prototype.trim = function() {
 	return this.replace(/^\s+|\s+$/g, "");
 };
@@ -9,7 +9,6 @@ String.prototype.rtrim = function() {
 	return this.replace(/\s+$/, "");
 };
 
-
 var Radio = function() {
 	this.importList();
 	return this;
@@ -18,17 +17,16 @@ var Radio = function() {
 Radio.prototype.favMy = function(_args) {
 	var id = Ti.Utils.md5HexDigest(_args.url);
 	var link = Ti.Database.open(RADIOLIST);
-	var res = link.execute('SELECT count(*) as total FROM my WHERE id=?', id);
+	var res = link.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
 	var now = (new Date).getTime();
 	if (res.isValidRow())
 		var total = res.fieldByName('total');
 	if (total)
-		link.execute('UDATE my SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.meta));
+		link.execute('UDATE myfavsandsaves SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.meta));
 	else
-		link.execute('INSERT INTO my VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.meta), now, now, 0, 1, 0);
+		link.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.meta), now, now, 0, 1, 0);
 	link.close();
 	_args.onload && (_args.onload(true));
-	
 
 };
 Radio.prototype.saveMy = function(_args) {
@@ -38,14 +36,19 @@ Radio.prototype.saveMy = function(_args) {
 			var link = Ti.Database.open(RADIOLIST);
 			var fh = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, id) : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, id);
 			fh.write(this.responseData);
-			var res = link.execute('SELECT count(*) as total FROM my WHERE id=?', id);
+			var res = link.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
 			var now = (new Date).getTime();
-			if (res.isValidRow())
+			if (res.isValidRow()) {
 				var total = res.fieldByName('total');
-			if (total)
-				link.execute('UDATE my SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.podcasts));
+				console.log('Info: ' + total + ' gefunden');
+			}
+			if (total) {
+				var q ='UDATE myfavsandsaves SET cached=1 WHERE id="'+id+'"';
+				console.log(q);
+				link.execute(q);
+			}
 			else
-				link.execute('INSERT INTO my VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcasts), now, now, 0, 1, 0);
+				link.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcasts), now, now, 0, 1, 0);
 			link.close();
 			_args.onload && (_args.onload(true));
 		},
@@ -60,7 +63,7 @@ Radio.prototype.saveMy = function(_args) {
 Radio.prototype.getMy = function(_podcast) {
 	var link = Ti.Database.open(RADIOLIST);
 	var id = _podcast.id;
-	var q = 'SELECT * FROM my WHERE id="' + id + '"';
+	var q = 'SELECT * FROM myfavsandsaves WHERE id="' + id + '"';
 	var res = link.execute(q);
 	var item = {};
 	if (res.isValidRow()) {
@@ -83,13 +86,14 @@ Radio.prototype.importList = function() {
 	var self = this;
 	function importIntoDB(groups) {
 		var link = Ti.Database.open(RADIOLIST);
-		link.execute('CREATE TABLE IF NOT EXISTS my (id TEXT, podcast TEXT, ctime NUMERIC, mtime NUMERIC, count NUMERIC,	faved NUMERIC, cached NUMERIC)');
+		link.execute('CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime NUMERIC, mtime NUMERIC, count NUMERIC,faved NUMERIC, cached NUMERIC)');
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
 		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
 		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT,livestreamurl TEXT)');
+		link.close();
+		link = Ti.Database.open(RADIOLIST);
 		link.execute('BEGIN');
-
 		// Sendergruppen
 		for (var i = 0; i < groups.length; i++) {
 			var group = (Object.prototype.toString.call(groups[i].sender) === '[object Array]') ? groups[i].sender : [groups[i].sender];
