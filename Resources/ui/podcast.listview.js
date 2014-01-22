@@ -87,6 +87,7 @@ exports.create = function(_parent, _podcastlist) {
 					listView.podcastwidget.togglePlay(podcast);
 					break;
 				case 2:
+					listView.progressview.setTitle(podcast.title);	
 					listView.progressview.setProgress(0);
 					listView.progressview.show();
 					listView.progressview.title.text = podcast.title;
@@ -99,6 +100,7 @@ exports.create = function(_parent, _podcastlist) {
 							listView.progressview.hide();
 						},
 					});
+					listView.progressview.setMessage('Starte Herunterladen …');	
 					break;
 				default:
 					Ti.UI.createNotification({
@@ -110,6 +112,6 @@ exports.create = function(_parent, _podcastlist) {
 	_parent.addEventListener('close', function() {
 		listView.podcastwidget.close();
 	});
-
+	
 	return listView;
 };

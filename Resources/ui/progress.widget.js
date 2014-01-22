@@ -5,7 +5,7 @@ exports.create = function() {
 	});
 	self.add(Ti.UI.createView({
 		backgroundColor : 'black',
-		opacity : 0.7
+		opacity : 0.8
 	}));
 	self.add(Ti.UI.createView({
 		backgroundColor : 'black',
@@ -15,13 +15,21 @@ exports.create = function() {
 	}));
 	self.container = Ti.UI.createView({
 		bottom : 0,
-		height : '100dp'
+		height : '80dp'
 	});
 	self.title = Ti.UI.createLabel({
 		color : 'white',
 		top : '5dp',
 		font : {
-			fontWeight : 'bold'
+			fontWeight : 'bold',
+			fontSize : '20dp'
+		}
+	});
+	self.message = Ti.UI.createLabel({
+		color : 'white',
+		bottom : '5dp',
+		font : {
+			fontSize : '14dp'
 		}
 	});
 	self.container.add(self.title);
@@ -36,6 +44,15 @@ exports.create = function() {
 	self.progress.show();
 	self.setProgress = function(e) {
 		self.progress.setValue(e);
+	};
+	self.setTitle = function(_foo) {
+		self.title.setText(_foo);
+	};
+	self.setProgress = function(e) {
+		self.progress.setValue(e);
+	};
+	self.setMessage = function(_foo) {
+		self.message.setText(_foo);
 	};
 	return self;
 

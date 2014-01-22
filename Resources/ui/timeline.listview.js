@@ -7,9 +7,31 @@ exports.create = function(_parent) {
 		defaultItemTemplate : 'ptemplate',
 		backgroundColor : 'white'
 	});
+	var onairView = Ti.UI.createView({
+		height : '50dp',
+		backgroundColor : '#3C3A37'
+	});
+	onairView.add(Ti.UI.createImageView({
+		width : '40dp',
+		height : '45dp',
+		left : '10dp',
+		image : '/images/onair.png'
+	}));
+	onairView.now = Ti.UI.createLabel({
+		left : '60dp',
+		color : 'red',
+		text : '00:00',
+		font : {
+			fontFamily : 'Astronaut',
+			fontSize : '50dp'
+		}
+	});
+	onairView.add(onairView.now);
 	var sections = [];
 	listView.update = function() {
 		var termine = Ti.App.Model.getSendungen();
+		if (termine[0].length == 0)
+			onairView.height = 0;
 		for (var s = 0; s < 3; s++) {
 			var sendungen = [];
 			if (termine[s])
@@ -30,7 +52,8 @@ exports.create = function(_parent) {
 							image : Ti.Filesystem.getFile('/images/' + sendung.senderid + '.png') ? '/images/' + sendung.senderid + '.png' : '/images/nil.png'
 						}
 					};
-					if (s ==2) listdataitem.time.text = 'morgen ' + listdataitem.time.text;
+					if (s == 2)
+						listdataitem.time.text = 'morgen ' + listdataitem.time.text;
 					if (s == 0) {
 						listdataitem.template = 'atemplate';
 						var width = parseInt((sendung.progress * 90) % 90);
@@ -43,16 +66,24 @@ exports.create = function(_parent) {
 					}
 					sendungen.push(listdataitem);
 				}
-			var headertitles = ['on air @ ' + require('vendor/moment')().format('HH:mm') + ' Uhr', ' in next future', 'tomorrow'];
-			sections[s] = Ti.UI.createListSection({
-				headerTitle : headertitles[s],
-				items : sendungen
-			});
+			var headertitles = ['', ' in den nächsten Stunden', 'Morgen'];
+			if (s > 0) {
+				sections[s] = Ti.UI.createListSection({
+					headerTitle : headertitles[s],
+					items : sendungen
+				});
+			} else {
+
+				sections[0] = Ti.UI.createListSection({
+					headerView : onairView,
+					items : sendungen
+				});
+			}
 		}
 		listView.setSections(sections);
 	};
 	_parent.add(listView);
-	
+
 	var Radio = require('ui/radio.widget');
 	listView.radiowidget = new Radio();
 	_parent.add(listView.radiowidget.getView());
@@ -62,6 +93,9 @@ exports.create = function(_parent) {
 		//e.section.updateItemAt(e.itemIndex, item);
 
 	});
-	
+	listView.cron = setInterval(function() {
+		onairView.now.setText(require('vendor/moment')().format('HH:mm:ss'));
+	}, 1000);
+
 	return listView;
 };

@@ -1,6 +1,7 @@
 exports.create = function(_sender) {
 	var self = Ti.UI.createWindow({
-		backgroundColor : 'white'
+		backgroundColor : 'white',
+		fullscreen : true
 	});
 	console.log(_sender);
 	var www = Ti.UI.createWebView({
@@ -38,8 +39,8 @@ exports.create = function(_sender) {
 		m3u : _sender.livestream.url,
 		onload : function(url) {
 			Ti.Android && Ti.UI.createNotification({
-		message : 'Starte Wiedergabe …'
-	}).show();
+				message : 'Starte Wiedergabe …'
+			}).show();
 			audioPlayer.setUrl(url);
 		}
 	});
