@@ -1,5 +1,6 @@
 build
 build.log
+tiapp.xml
 tmp
 ._*
 .DS_Store
