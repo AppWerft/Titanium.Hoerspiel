@@ -4,7 +4,7 @@ exports.create = function(_sender) {
 		backgroundColor : 'white',
 		layout : 'vertical'
 	});
-	var stations = ['hr', 'wdr', 'dlf', 'drk', 'drw', 'srf2','ndr', 'dw','mdr','br'];
+	var stations = ['hr', 'wdr', 'dlf', 'drk', 'drw', 'srf2','ndr', 'dw','mdr','br','rwb'];
 	var width = stations.length * W + 'dp';
 	var stationsview = Ti.UI.createScrollView({
 		width : Ti.UI.FILL,
@@ -35,7 +35,7 @@ exports.create = function(_sender) {
 			ndx : _e.source.ndx
 		});
 		stationsview.contentOffset = {
-			x : 75 * _e.source.ndx,
+			x : 75 * _e.source.ndx+40,
 			y : 0
 		};
 	});

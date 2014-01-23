@@ -1,76 +1,42 @@
 exports.create = function() {
-	function updateList() {
-		var podcasts = Ti.App.Model.getMy();
-		var types = ['cached', 'faved', 'recent'];
-		for (var t = 0; t < types.length; t++) {
-			var type = types[t];
-			var items = [];
-			console.log(podcasts[type]);
-			if (podcasts[type])
-				for (var i = 0; i < podcasts[type].length; i++) {
-					var podcast = podcasts[type][i];
-					items.push({
-						properties : {
-							itemId : JSON.stringify(podcast),
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-						},
-						title : {
-							text : podcast.title
-						},
-						author : {
-							text : podcast.author
-						},
-						duration : {
-							text : 'Dauer: ' + podcast.duration
-						},
-						pubdate : {
-							text : 'Sendezeit: ' + podcast.pubdate
-						},
-						pict : {
-							image : podcast.pict
-						},
-						cached : {
-							image :  '/images/nil.png'
-						},
-						faved : {
-							image :  '/images/nil.png'
-						},
-						summary : {
-							height : 0
-						}
-					});
-				}
-			console.log(items);
-			sections[t].setItems(items);
-		}
-		listView.setSections(sections);
-	}
-
 	var self = Ti.UI.createWindow({
 		backgroundImage : 'default.png'
 	});
-	var listView = Ti.UI.createListView({
-		templates : {
-			'template' : require('ui/templates').podcastTemplate
-		},
-		defaultItemTemplate : 'template',
-		backgroundImage : '/default.png'
+	var types = [{
+		key : 'cached',
+		title : 'lokale Podcast'
+	}, {
+		key : 'faved',
+		title : 'Lieblinge'
+	}, {
+		key : 'recent',
+		title : 'Letztgehört'
+	}];
+	var listviews = [];
+	for (var i = 0; i < types.length; i++) {
+		listviews.push(require('ui/myradio.listview').create(types[i]));
+	}
+	self.scrollableView = Ti.UI.createScrollableView({
+		bottom : '20dp',
+		views : listviews,
+		backgroundColor : 'white'
 	});
-	self.add(listView);
-	listView.progressview = require('ui/progress.widget').create();
-	var sections = [];
-	sections[0] = Ti.UI.createListSection({
-		headerTitle : 'Meine gespeicherten Podcasts',
+	self.add(self.scrollableView);
+	var navitexts = ['✦ ● ●', '● ✦ ●', '● ● ✦'];
+	var navi = Ti.UI.createLabel({
+		bottom : 0,
+		height : '20dp',
+		opacity : 0.6,
+		text : '✦ ● ●'
 	});
-	sections[1] = Ti.UI.createListSection({
-		headerTitle : 'Meine vorgemerkten Podcasts',
-	});
-	sections[2] = Ti.UI.createListSection({
-		headerTitle : 'Meine letztlich gehörten Podcasts',
-	});
-	listView.setSections(sections);
+	self.add(navi);
 	var PodCast = require('ui/podcast.widget');
-	listView.podcastwidget = new PodCast();
-	self.addEventListener('focus', updateList);
+	self.podcastwidget = new PodCast();
+	self.scrollableView.addEventListener('scrollend', function(_e) {
+		var podcasts = Ti.App.Model.getMy();
+		listviews[_e.currentPage].update();
+		navi.setText(navitexts[_e.currentPage]);
+	});
+	listviews[0].update();
 	return self;
 };

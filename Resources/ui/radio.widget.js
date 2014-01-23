@@ -20,13 +20,18 @@ var getUrl = function(_args) {
 var Radio = function() {
 	var self = this;
 	this.cron = null;
-	Ti.Android.currentActivity.addEventListener("paused", function() {
+	Ti.Android.currentActivity.addEventListener("pause", function() {
 		console.log('PAUSED');
 	});
-	Ti.Android.currentActivity.addEventListener("resumed", function() {
+	Ti.Android.currentActivity.addEventListener("resume", function() {
 		console.log('PAUSED');
 	});
-
+	Ti.Android.currentActivity.addEventListener("start", function() {
+		console.log('STARTD');
+	});
+	Ti.Android.currentActivity.addEventListener("stop", function() {
+		console.log('PAUSED');
+	});
 	Ti.App.addEventListener('resumed', function() {
 		console.log('Info: app resumed');
 		if (self.playing) {
@@ -61,6 +66,9 @@ var Radio = function() {
 		height : H,
 		duration : 100,
 		opacity : 0.1
+	});
+	this.radiocontainer.addEventListener('blur', function() {
+		self.animatedvolumemeter.stop();
 	});
 	this.label = Ti.UI.createLabel({
 		color : 'white',
@@ -99,7 +107,7 @@ var Radio = function() {
 	});
 
 	this.audioPlayer.addEventListener('change', function(_e) {
-		clearInterval(self.cron);
+
 		self.progress.value = 0;
 		self.progress.view.setWidth(0);
 		switch (_e.description) {
@@ -109,6 +117,7 @@ var Radio = function() {
 				self.playing = false;
 				break;
 			case 'playing':
+				self.cron && clearInterval(self.cron);
 				self.playing = true;
 				self.animatedvolumemeter.start();
 				self.animatedvolumemeter.setOpacity(1);

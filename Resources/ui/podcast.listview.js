@@ -24,7 +24,7 @@ exports.create = function(_parent, _podcastlist) {
 				var items = [];
 				for (var i = 0; i < _podcasts.length; i++) {
 					var podcast = _podcasts[i];
-					items.push({
+					var item = {
 						properties : {
 							itemId : JSON.stringify(podcast),
 							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
@@ -53,7 +53,13 @@ exports.create = function(_parent, _podcastlist) {
 						faved : {
 							image : (podcast.faved) ? '/images/faved.png' : '/images/nil.png'
 						}
-					});
+					};
+					if (!podcast.summary)
+						item.summary.height = 0;
+					if (!podcast.author)
+						item.author.height = 0;
+
+					items.push(item);
 				}
 				sections[0] = Ti.UI.createListSection({
 					//headerTitle : _podcast.channel.image.title,

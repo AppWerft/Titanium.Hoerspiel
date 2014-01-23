@@ -3,7 +3,7 @@ exports.create = function() {
 		var items = [];
 		for (var i = 0; i < _podcasts.length; i++) {
 			var podcast = _podcasts[i];
-			items.push({
+			podcast.title && items.push({
 				properties : {
 					itemId : JSON.stringify(podcast),
 					accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
@@ -15,7 +15,8 @@ exports.create = function() {
 					text : podcast.summary
 				},
 				logo : {
-					image : (podcast.logo) ? podcast.logo: '/images/' + _station + '.png'
+					image : (podcast.logo) ? podcast.logo : '/images/' + _station + '.png',
+					defaultImage : '/images/' + _station + '.png'
 				}
 			});
 		}
@@ -55,7 +56,7 @@ exports.create = function() {
 		sections[4] = Ti.UI.createListSection({
 			headerTitle : 'Deutschlandradio Wissen',
 			items : getItems(_podcasts.drw, 'drw')
-			});
+		});
 		listView.setSections(sections);
 	});
 	sections[5] = Ti.UI.createListSection({
@@ -75,6 +76,21 @@ exports.create = function() {
 	});
 	sections[7].setItems(getItems(require('model/podcasts/dw').get(), 'dw'));
 
+	sections[8] = Ti.UI.createListSection({
+		headerTitle : 'Mitteldeutscher Rundfunk',
+	});
+	sections[8].setItems(getItems(require('model/podcasts/mdr').get(), 'mdr'));
+
+	sections[9] = Ti.UI.createListSection({
+		headerTitle : 'Bayrischer Rundfunk',
+	});
+	sections[9].setItems(getItems(require('model/podcasts/br').get(), 'br'));
+
+	sections[10] = Ti.UI.createListSection({
+		headerTitle : 'freie-radios.net',
+	});
+	sections[10].setItems(getItems(require('model/podcasts/rwb').get(), 'rwb'));
+
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
 		if (Ti.Android)
@@ -83,10 +99,7 @@ exports.create = function() {
 			self.tab.open(win);
 	});
 	listView.addEventListener('scrollto', function(_e) {
-		if (_e.ndx < 8) {
-			listView.scrollToItem(_e.ndx, 0);
-			listView.scrollToItem(_e.ndx, 10);
-		}
+		listView.scrollToItem(_e.ndx, 0);
 	});
 	return listView;
 };

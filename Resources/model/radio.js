@@ -40,7 +40,7 @@ Radio.prototype.getMy = function() {
 			} catch(E) {
 				console.log('Warning: cannot parse JSON from DB');
 			}
-			if (entry.count>0)
+			if (entry.count > 0)
 				entry.recent = true;
 			if (entry.title) {
 				if (entry.cached)
@@ -212,9 +212,7 @@ Radio.prototype.getPodcast = function(_args) {
 		res.close();
 		return item;
 	}
-
 	if (true == Ti.Network.online) {
-
 		var xhr = Ti.Network.createHTTPClient({
 			ondatastream : function(e) {
 				_args.onprogress(e.progress);
@@ -233,7 +231,7 @@ Radio.prototype.getPodcast = function(_args) {
 				}).show();
 				for (var c = 0; c < items.length; c++) {
 					var item = items.item(c);
-					var title = Elem2Text(item, "title");
+					var title = Elem2Text(item, "title").replace(/&quot;/g,'"').replace(/#39;/g,'"');
 					var duration = Elem2Text(item, "itunes:duration");
 					var author = Elem2Text(item, "itunes:author");
 					var pubdate = moment(Elem2Text(item, "pubDate")).format('LLLL');
@@ -252,6 +250,8 @@ Radio.prototype.getPodcast = function(_args) {
 					}
 					var res = (description) ? /src="(.*?)"/g.exec(description) : null;
 					var state = getMyState(id) || {};
+					if (title.match(/\[PDF\]/i))
+						continue;
 					podcasts.push({
 						title : title,
 						faved : state.faved,
@@ -271,6 +271,7 @@ Radio.prototype.getPodcast = function(_args) {
 			}
 		});
 		xhr.open('GET', _args.podcastlist.feed, true);
+		console.log(_args.podcastlist.feed);
 		xhr.send();
 	} else
 		link.close();
@@ -334,7 +335,5 @@ Radio.prototype.getSendungen = function() {
 	link.close();
 	return termine;
 };
-
-
 
 module.exports = Radio;
