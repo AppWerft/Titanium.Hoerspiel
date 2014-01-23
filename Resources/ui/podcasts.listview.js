@@ -39,6 +39,7 @@ exports.create = function() {
 		headerTitle : 'Westdeutscher Rundfunk',
 	});
 	require('model/podcasts/wdr').get(function(_podcasts) {
+		console.log(_podcasts);
 		sections[1].setItems(getItems(_podcasts, 'wdr'));
 		listView.setSections(sections);
 	});
@@ -65,9 +66,14 @@ exports.create = function() {
 		listView.setSections(sections);
 	});
 	sections[6] = Ti.UI.createListSection({
+		headerTitle : 'Norddeutscher Rundfunk',
+	});
+	sections[6].setItems(getItems(require('model/podcasts/ndr').get(), 'ndr'));
+
+	sections[7] = Ti.UI.createListSection({
 		headerTitle : 'Deutsche Welle',
 	});
-	sections[6].setItems(getItems(require('model/podcasts/dw').get(), 'dw'));
+	sections[7].setItems(getItems(require('model/podcasts/dw').get(), 'dw'));
 
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
