@@ -4,7 +4,7 @@ exports.create = function(_sender) {
 		backgroundColor : 'white',
 		layout : 'vertical'
 	});
-	var stations = ['hr', 'dw', 'dlf', 'drk', 'drw', 'srf2','ndr', 'wdr','mdr','br'];
+	var stations = ['hr', 'wdr', 'dlf', 'drk', 'drw', 'srf2','ndr', 'dw','mdr','br'];
 	var width = stations.length * W + 'dp';
 	var stationsview = Ti.UI.createScrollView({
 		width : Ti.UI.FILL,

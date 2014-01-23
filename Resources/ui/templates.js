@@ -189,7 +189,8 @@ exports.podcastsTemplate = {
 
 exports.podcastTemplate = {
 	properties : {
-		height : Ti.UI.SIZE
+		height : Ti.UI.SIZE,
+		backgroundColor : 'white'
 	},
 	childTemplates : [{
 		type : 'Ti.UI.ImageView',
@@ -199,6 +200,26 @@ exports.podcastTemplate = {
 			height : '70dip',
 			top : 0,
 			left : 0
+		}
+	}, {
+		type : 'Ti.UI.ImageView',
+		bindId : 'cached',
+		properties : {
+			width : '20dip',
+			height : '20dip',
+			bottom : '5dp',
+			left : '30dp',
+			image : '/images/nil.png'
+		}
+	}, {
+		type : 'Ti.UI.ImageView',
+		bindId : 'faved',
+		properties : {
+			width : '20dip',
+			height : '20dip',
+			bottom : '5dp',
+			left : '2dp',
+			image : '/images/nil.png'
 		}
 	}, {
 		type : 'Ti.UI.View',

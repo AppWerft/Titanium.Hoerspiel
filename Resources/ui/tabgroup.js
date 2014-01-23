@@ -56,9 +56,10 @@ exports.create = function() {// this sets the background color of the master UIV
 	//  add tabs
 	//
 	tabGroup.addTab(tab1);
-	tabGroup.addTab(tab2);
 	tabGroup.addTab(tab3);
 	tabGroup.addTab(tab4);
+	tabGroup.addTab(tab2);
+	
 	tab1.addEventListener('focus', function(_e) {
 		actionBar.setTitle('Hörspielkalender');
 	});
@@ -71,7 +72,7 @@ exports.create = function() {// this sets the background color of the master UIV
 
 	});
 	tab4.addEventListener('focus', function(_e) {
-		actionBar.setTitle('Mein Radio (noch in Arbeit …)');
+		actionBar.setTitle('Mein Radio');
 
 	});
 	tabGroup.open();

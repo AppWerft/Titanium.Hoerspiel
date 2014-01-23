@@ -36,10 +36,10 @@ exports.create = function() {
 		items : getItems(require('model/podcasts/hr2').list, 'hr2')
 	});
 	sections[1] = Ti.UI.createListSection({
-		headerTitle : 'Deutsche Welle',
+		headerTitle : 'Westdeutscher Rundfunk',
 	});
-	require('model/podcasts/dw').get(function(_podcasts) {
-		sections[1].setItems(getItems(_podcasts, 'dw'));
+	require('model/podcasts/wdr').get(function(_podcasts) {
+		sections[1].setItems(getItems(_podcasts, 'wdr'));
 		listView.setSections(sections);
 	});
 	require('model/podcasts/dlr').get(function(_podcasts) {
@@ -65,9 +65,9 @@ exports.create = function() {
 		listView.setSections(sections);
 	});
 	sections[6] = Ti.UI.createListSection({
-		headerTitle : 'Westdeutscher Rundfunk',
+		headerTitle : 'Deutsche Welle',
 	});
-	sections[6].setItems(getItems(require('model/podcasts/wdr').list, 'wdr'));
+	sections[6].setItems(getItems(require('model/podcasts/dw').get(), 'dw'));
 
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));

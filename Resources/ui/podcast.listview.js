@@ -15,10 +15,12 @@ exports.create = function(_parent, _podcastlist) {
 		Ti.App.Model.getPodcast({
 			podcastlist : _podcastlist,
 			onprogress : function(e) {
-				progress.setValue(e);
+				listView.progressview.setProgress(e);
+				listView.progressview.setMessage('Bitte etwas Geduld.');
+
 			},
 			onload : function(_podcasts) {
-				progress.hide();
+				listView.progressview.hide();
 				var items = [];
 				for (var i = 0; i < _podcasts.length; i++) {
 					var podcast = _podcasts[i];
@@ -44,6 +46,12 @@ exports.create = function(_parent, _podcastlist) {
 						},
 						pict : {
 							image : podcast.pict
+						},
+						cached : {
+							image : (podcast.cached) ? '/images/cached.png' : '/images/nil.png'
+						},
+						faved : {
+							image : (podcast.faved) ? '/images/faved.png' : '/images/nil.png'
 						}
 					});
 				}
@@ -54,28 +62,20 @@ exports.create = function(_parent, _podcastlist) {
 				listView.setSections(sections);
 			}
 		});
+		listView.progressview.setTitle('Hole Podcastliste\n' + _podcastlist.title);
+		listView.progressview.show();
 	}, 10);
 	_parent.add(listView.podcastwidget.getView());
 	_parent.add(listView.progressview);
-	var progress = Ti.UI.createProgressBar({
-		height : '50dp',
-		bottom : '10dp',
-		min : 0,
-		max : 1,
-		value : 0,
-		width : '90%',
-		zIndex : 9999
-	});
-	_parent.add(progress);
-	progress.show();
 	listView.addEventListener('itemclick', function(e) {
+		var item = e.section.getItemAt(e.itemIndex);
+		console.log(item);
 		var podcast = JSON.parse(e.itemId);
 		//var state = Ti.App.Model.getMy(podcast);
 		var opts = {
-			cancel : 3,
-			options : ['Jetzt hören', 'Vormerken', 'Speichern', 'Kanal abonnieren'],
-			selectedIndex : 3,
-			destructive : 0,
+			options : ['Jetzt anhören', 'Vormerken', 'Lokal speichern', 'Kanal abonnieren'],
+			selectedIndex : 0,
+			destructive : 2,
 			title : podcast.title
 		};
 
@@ -85,9 +85,24 @@ exports.create = function(_parent, _podcastlist) {
 			switch (_evt.index) {
 				case 0:
 					listView.podcastwidget.togglePlay(podcast);
+					Ti.App.Model.recentMy({
+						podcast : podcast,
+						onload : function() {
+						}
+					});
+					break;
+				case 1:
+					Ti.App.Model.favMy({
+						podcast : podcast,
+						onload : function() {
+						}
+					});
+					item.faved.image = '/images/faved.png';
+					e.section.updateItemAt(e.itemIndex, item);
+
 					break;
 				case 2:
-					listView.progressview.setTitle(podcast.title);	
+					listView.progressview.setTitle(podcast.title);
 					listView.progressview.setProgress(0);
 					listView.progressview.show();
 					listView.progressview.title.text = podcast.title;
@@ -95,24 +110,28 @@ exports.create = function(_parent, _podcastlist) {
 						podcast : podcast,
 						onprogress : function(_p) {
 							listView.progressview.setProgress(_p);
-							listView.progressview.setMessage('schon da: ' + parseInt(_p*100) +'%');
+							listView.progressview.setMessage('schon da: ' + parseInt(_p * 100) + '%');
 						},
 						onload : function(_p) {
 							listView.progressview.hide();
+							item.cached.image = '/images/cached.png';
+							e.section.updateItemAt(e.itemIndex, item);
 						},
 					});
-					listView.progressview.setMessage('Starte Herunterladen …');	
+					listView.progressview.show();
+					listView.progressview.setMessage('Starte Herunterladen …');
 					break;
 				default:
 					Ti.UI.createNotification({
 						message : 'Das ist noch nicht realisiert,'
 					}).show();
+
 			}
 		});
 	});
 	_parent.addEventListener('close', function() {
 		listView.podcastwidget.close();
 	});
-	
+
 	return listView;
 };

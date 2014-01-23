@@ -1,4 +1,4 @@
-const RADIOLIST = 'RadioListFavsSaves';
+const RADIOLIST = 'Radio_ListFavsSaves';
 String.prototype.trim = function() {
 	return this.replace(/^\s+|\s+$/g, "");
 };
@@ -14,85 +14,128 @@ var Radio = function() {
 	return this;
 };
 
-Radio.prototype.favMy = function(_args) {
-	var id = Ti.Utils.md5HexDigest(_args.url);
+Radio.prototype.getMy = function() {
 	var link = Ti.Database.open(RADIOLIST);
-	var res = link.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
-	var now = (new Date).getTime();
-	if (res.isValidRow())
-		var total = res.fieldByName('total');
-	if (total)
-		link.execute('UDATE myfavsandsaves SET mtime=?,meta=? WHERE id=?', now, JSON.stringify(_args.meta));
-	else
-		link.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.meta), now, now, 0, 1, 0);
-	link.close();
-	_args.onload && (_args.onload(true));
-
+	var list = {
+		faved : [],
+		cached : [],
+		recent : []
+	};
+	if (link) {
+		var res = link.execute('SELECT * FROM myfavsandsaves ORDER BY mtime DESC');
+		while (res.isValidRow()) {
+			var entry = {
+				mtime : res.fieldByName('mtime'),
+				ctime : res.fieldByName('ctime'),
+				count : res.fieldByName('count'),
+				id : res.fieldByName('id'),
+				cached : (res.fieldByName('localcached')) ? true : false,
+				faved : (res.fieldByName('faved')) ? true : false,
+			};
+			try {
+				var podcast = JSON.parse(res.fieldByName('podcast'));
+				for (var key in podcast) {
+					entry[key] = podcast[key];
+				}
+			} catch(E) {
+				console.log('Warning: cannot parse JSON from DB');
+			}
+			if (entry.count>0)
+				entry.recent = true;
+			if (entry.title) {
+				if (entry.cached)
+					list.cached.push(entry);
+				if (entry.faved)
+					list.faved.push(entry);
+				if (entry.recent)
+					list.recent.push(entry);
+			}
+			res.next();
+		}
+		return list;
+	}
+	console.log('Warning: cannot link to DB');
+	return null;
 };
+
 Radio.prototype.saveMy = function(_args) {
 	var id = Ti.Utils.md5HexDigest(_args.podcast.media);
 	var xhr = Ti.Network.createHTTPClient({
 		onload : function() {
-			var link = Ti.Database.open(RADIOLIST);
+			var db = Ti.Database.open(RADIOLIST);
 			var fh = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, id) : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, id);
 			fh.write(this.responseData);
-			var res = link.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
+			var res = db.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
 			var now = (new Date).getTime();
 			if (res.isValidRow()) {
 				var total = res.fieldByName('total');
 				console.log('Info: ' + total + ' gefunden');
 			}
 			if (total) {
-				var q ='UDATE myfavsandsaves SET cached=1 WHERE id="'+id+'"';
-				console.log(q);
-				link.execute(q);
-			}
-			else
-				link.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcasts), now, now, 0, 1, 0);
-			link.close();
+				db.execute('UPDATE myfavsandsaves SET localcached=1 WHERE id=?', id);
+			} else
+				db.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcast), now, now, 0, 0, 1);
 			_args.onload && (_args.onload(true));
+			db.close();
 		},
 		ondatastream : function(_e) {
 			_args.onprogress && _args.onprogress(_e.progress);
+			var length = xhr.getResponseHeader('Content-Length') / 1000;
 		}
 	});
 	xhr.open('GET', _args.podcast.media);
 	xhr.send();
 };
 
-Radio.prototype.getMy = function(_podcast) {
-	var link = Ti.Database.open(RADIOLIST);
-	var id = _podcast.id;
-	var q = 'SELECT * FROM myfavsandsaves WHERE id="' + id + '"';
-	var res = link.execute(q);
-	var item = {};
+Radio.prototype.favMy = function(_args) {
+	var id = Ti.Utils.md5HexDigest(_args.podcast.media);
+	var db = Ti.Database.open(RADIOLIST);
+	var res = db.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
+	var now = (new Date).getTime();
 	if (res.isValidRow()) {
-		item = {
-			mtime : res.fieldByName('mtime'),
-			ctime : res.fieldByName('ctime'),
-			count : res.fieldByName('count'),
-			local : res.fieldByName('local'),
-			meta : JSON.parse(res.fieldByName('meta'))
-		};
+		var total = res.fieldByName('total');
+		console.log('Info: ' + total + ' gefunden');
 	}
-	res.close();
-	link.close();
-	var fh = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, id) : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, id);
-	item.url = (fh.exists()) ? fh.nativePath : _podcast.url;
-	return item;
+	console.log(_args.podcast);
+	if (total) {
+		db.execute('UPDATE myfavsandsaves SET faved=1 WHERE id=?', id);
+	} else
+		db.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcast), now, now, 0, 1, 0);
+	_args.onload && (_args.onload(true));
+	db.close();
+
+};
+Radio.prototype.recentMy = function(_args) {
+	var id = Ti.Utils.md5HexDigest(_args.podcast.media);
+	var db = Ti.Database.open(RADIOLIST);
+	var res = db.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
+	var now = (new Date).getTime();
+	if (res.isValidRow()) {
+		var total = res.fieldByName('total');
+		console.log('Info: ' + total + ' gefunden');
+	}
+	console.log(_args.podcast);
+	if (total) {
+		db.execute('UPDATE myfavsandsaves SET count=count+1 WHERE id=?', id);
+	} else
+		db.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcast), now, now, 1, 0, 0);
+	_args.onload && (_args.onload(true));
+	db.close();
+
 };
 
 Radio.prototype.importList = function() {
 	var self = this;
 	function importIntoDB(groups) {
+		//var link = Ti.Database.install('/model/radio.sql',RADIOLIST);
 		var link = Ti.Database.open(RADIOLIST);
-		link.execute('CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime NUMERIC, mtime NUMERIC, count NUMERIC,faved NUMERIC, cached NUMERIC)');
+
+		link.execute('CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime INTEGER, mtime INTEGER, count INTEGER,faved INTEGER, localcached INTEGER)');
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
 		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
 		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT,livestreamurl TEXT)');
-		link.close();
-		link = Ti.Database.open(RADIOLIST);
+		console.log('Info:db installed/opened, now import begins');
 		link.execute('BEGIN');
 		// Sendergruppen
 		for (var i = 0; i < groups.length; i++) {
@@ -122,8 +165,11 @@ Radio.prototype.importList = function() {
 			}
 		}
 		link.execute('COMMIT');
+		console.log('Info:db import finished: ' + s);
 		link.close();
 		Ti.App.Properties.setList(RADIOLIST, groups);
+		console.log('Info: groups wrote in properties');
+
 	};
 	if (!Ti.App.Properties.hasProperty(RADIOLIST)) {// app is virgin
 		var groups = JSON.parse(Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'model', 'senderliste.json').read().text);
@@ -142,15 +188,33 @@ Radio.prototype.importList = function() {
 };
 
 Radio.prototype.getPodcast = function(_args) {
+	var link = Ti.Database.open(RADIOLIST);
 	function Elem2Text(_elem, _key) {
 		var foo = _elem.getElementsByTagName(_key);
 		return (foo.length) ? foo.item(0).textContent : null;
 	}
 
+	function getMyState(id) {
+		var q = 'SELECT * FROM myfavsandsaves WHERE id="' + id + '"';
+		var res = link.execute(q);
+		var item = {};
+		if (res.isValidRow()) {
+			item = {
+				mtime : res.fieldByName('mtime'),
+				ctime : res.fieldByName('ctime'),
+				count : res.fieldByName('count'),
+				cached : res.fieldByName('localcached'),
+				faved : res.fieldByName('faved'),
+				meta : JSON.parse(res.fieldByName('meta'))
+			};
+		} else
+			item = {};
+		res.close();
+		return item;
+	}
+
 	if (true == Ti.Network.online) {
-		Ti.Android && Ti.UI.createNotification({
-			message : 'Retrieving podcast\n„' + _args.podcastlist.title + "“"
-		}).show();
+
 		var xhr = Ti.Network.createHTTPClient({
 			ondatastream : function(e) {
 				_args.onprogress(e.progress);
@@ -184,10 +248,14 @@ Radio.prototype.getPodcast = function(_args) {
 					var enclosure = item.getElementsByTagName("enclosure");
 					if (enclosure && enclosure.getLength() > 0) {
 						var media = enclosure.item(0).getAttribute('url');
+						var id = Ti.Utils.md5HexDigest(media);
 					}
 					var res = (description) ? /src="(.*?)"/g.exec(description) : null;
+					var state = getMyState(id) || {};
 					podcasts.push({
 						title : title,
+						faved : state.faved,
+						cached : state.cached,
 						duration : (duration) ? duration : 'keine Angabe',
 						author : author,
 						pubdate : pubdate,
@@ -198,12 +266,14 @@ Radio.prototype.getPodcast = function(_args) {
 					});
 				}
 				_args.onload(podcasts);
+				link.close();
 
 			}
 		});
 		xhr.open('GET', _args.podcastlist.feed, true);
 		xhr.send();
-	}
+	} else
+		link.close();
 };
 
 Radio.prototype.getStationGroups = function() {
@@ -211,7 +281,7 @@ Radio.prototype.getStationGroups = function() {
 };
 
 Radio.prototype.getSendungen = function() {
-	//	console.log('Info: try to open ' + RADIOLIST);
+	console.log('Info: try to open db, reading of sendungen');
 	var moment = require('vendor/moment');
 	var now = parseInt(moment().format('HH')) * 60 + parseInt(moment().format('m'));
 	function res2termin(res) {

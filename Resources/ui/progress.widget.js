@@ -22,7 +22,7 @@ exports.create = function() {
 	self.title = Ti.UI.createLabel({
 		color : 'white',
 		top : '5dp',
-		height : '20dp',
+		height : '40dp',width:Ti.UI.FILL,
 		font : {
 			fontWeight : 'bold',
 			fontSize : '16dp'
@@ -34,16 +34,16 @@ exports.create = function() {
 		width : '100%',
 		min : 0,
 		max : 1,
-		height : '30dp',
-		top : '5dp'
+		height : '25dp',
+		top : 0
 	});
 	self.container.add(self.progress);
 	self.progress.show();
 	self.message = Ti.UI.createLabel({
-		color : 'white',
+		color : 'white',width:Ti.UI.FILL,
 		top : '10dp',textAlign:'left',
 		font : {
-			fontSize : '14dp'
+			fontSize : '10dp'
 		}
 	});
 	self.container.add(self.message);
