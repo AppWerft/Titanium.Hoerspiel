@@ -49,6 +49,7 @@ exports.create = function() {
 	});
 	function updateTweetsOnGUI() {
 		Ti.App.Twitter.fetch('search_tweets', 'Hörspiel', function(_response) {
+			console.log('Info: tweets = ' +_response.statuses.length);
 			var rows = [];
 			for (var i = 0; i < _response.statuses.length; i++) {
 				var tweet = _response.statuses[i];
