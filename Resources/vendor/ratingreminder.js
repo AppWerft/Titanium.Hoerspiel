@@ -5,9 +5,9 @@ exports.start = function() {
 		Ti.App.Properties.setString('RemindToRate', now);
 	} else if (remindToRate < now) {
 		var alertDialog = Ti.UI.createAlertDialog({
-			title : 'Please rate this app!',
-			message : 'Would you take a moment to rate this app?',
-			buttonNames : ['OK', 'Remind Me Later', 'Never'],
+			title : 'Bitte bewerte diese App!',
+			message : 'Möchtest Du jetzt Hörspiel2Go bewerten?',
+			buttonNames : ['OK', 'Erinnere mich später', 'Nie wieder'],
 			cancel : 2
 		});
 		alertDialog.addEventListener('click', function(evt) {

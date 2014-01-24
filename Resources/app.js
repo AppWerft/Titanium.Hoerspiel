@@ -1,5 +1,5 @@
-// this sets the background color of the master UIView (when there are no windows/tab groups on it)
-var RadioModel = require('model/radio');
-Ti.App.Model = new RadioModel();
-
-require('ui/tabgroup').create();
+(function() {
+	Ti.App.Model = new (require('model/radio'))();
+	Ti.App.Twitter = new (require('model/twitter_adapter'))();
+	require('ui/tabgroup').create();
+})();

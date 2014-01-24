@@ -1,6 +1,3 @@
-var images = [];
-for (var i = 0; i <= 16; i++)
-	images.push('/images/vumeter/tmp-' + i + '.png');
 
 exports.timelineactiveTemplate = {
 	properties : {

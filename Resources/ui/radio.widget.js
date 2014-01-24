@@ -107,7 +107,6 @@ var Radio = function() {
 	});
 
 	this.audioPlayer.addEventListener('change', function(_e) {
-
 		self.progress.value = 0;
 		self.progress.view.setWidth(0);
 		switch (_e.description) {

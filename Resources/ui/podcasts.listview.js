@@ -91,6 +91,10 @@ exports.create = function() {
 	});
 	sections[10].setItems(getItems(require('model/podcasts/rwb').get(), 'rwb'));
 
+	sections[11] = Ti.UI.createListSection({
+		headerTitle : 'Ohrcast',
+	});
+	sections[11].setItems(getItems(require('model/podcasts/ohrcast').get(), 'ohrcast'));
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
 		if (Ti.Android)
@@ -99,7 +103,10 @@ exports.create = function() {
 			self.tab.open(win);
 	});
 	listView.addEventListener('scrollto', function(_e) {
-		listView.scrollToItem(_e.ndx, 0);
+		try {
+			listView.scrollToItem(_e.ndx, 0);
+		} catch(E) {
+		}
 	});
 	return listView;
 };

@@ -33,7 +33,6 @@ exports.create = function() {
 	var PodCast = require('ui/podcast.widget');
 	self.podcastwidget = new PodCast();
 	self.scrollableView.addEventListener('scrollend', function(_e) {
-		var podcasts = Ti.App.Model.getMy();
 		listviews[_e.currentPage].update();
 		navi.setText(navitexts[_e.currentPage]);
 	});

@@ -1,80 +1,95 @@
 exports.create = function() {// this sets the background color of the master UIView (when there are no windows/tab groups on it)
-	var tabGroup = Ti.UI.createTabGroup({
+	var self = Ti.UI.createTabGroup({
 		fullscreen : true,
 		exitOnClose : true
 	});
-
-	//tabGroup.addEventListener('open', require('ui/actionbar_menu.widget'));
-	/*require('ui/actionbar_menu.widget')(
-	 tabGroup
-	 );*/
-
-	var actionBar;
-	tabGroup.addEventListener("open", function() {
-		if (Ti.Platform.osname === "android") {
-			if (! tabGroup.getActivity()) {
-				Ti.API.error("Can't access action bar on a lightweight window.");
-			} else {
-				actionBar = tabGroup.getActivity().actionBar;
-				if (actionBar) {
-					actionBar.title = "Hörspielkalender";
-					actionBar.onHomeIconItemSelected = function() {
-						Ti.API.info("Home icon clicked!");
-					};
-				}
-				/*var abe = require('com.alcoapps.actionbarextras');
-				abe.setExtras({
-					title : 'Hörspielkalender',
-					subtitle : 'Gerade laufende und nächste Hörspiele',
-					backgroundColor : '#ff4f00'
-				});*/
-			}
+	self.addEventListener("open", function(e) {
+		if (Ti.Android) {
+			self.activity = self.getActivity();
+			self.actionBar = self.activity.actionBar;
+			self.activity.onCreateOptionsMenu = function(e) {
+				e.menu.clear();
+				e.activity = self.activity;
+				e.actionBar = self.actionBar;
+				self.activeTab.fireEvent('onCreateOptionsMenu', e);
+			};
+			self.activity.onPrepareOptionsMenu = function(e) {
+				self.activeTab.fireEvent('onPrepareOptionsMenu', e);
+			};
+			self.activity.invalidateOptionsMenu();
 		}
 	});
-	var tab1 = Ti.UI.createTab({
+	self.addEventListener('focus', function(e) {
+		self.getActivity().invalidateOptionsMenu();
+	});
+	
+	
+	var tabs = [Ti.UI.createTab({
 		title : '>> on Air',
 		window : require('ui/timeline.window').create()
-	});
-	var tab2 = Ti.UI.createTab({
+	}), Ti.UI.createTab({
 		title : 'Radiosender',
 		window : require('ui/stations.window').create()
-	});
-
-	
-
-	var tab3 = Ti.UI.createTab({
-		title : 'Podcasts',
+	}), Ti.UI.createTab({
+		title : 'alle Podcasts',
 		window : require('ui/podcasts.window').create()
-	});
-
-	var tab4 = Ti.UI.createTab({
-		title : 'Mein Radio',
+	}), Ti.UI.createTab({
+		title : 'mein Radio',
 		window : require('ui/myradio.window').create()
-	});
-
-	//
-	//  add tabs
-	//
-	tabGroup.addTab(tab1);
-	tabGroup.addTab(tab3);
-	tabGroup.addTab(tab4);
-	tabGroup.addTab(tab2);
+	}), Ti.UI.createTab({
+		title : 'Twitter',
+		window : require('ui/twitter.window').create()
+	})];
+	for (var i = 0; i < tabs.length; i++) {
+		self.addTab(tabs[i]);
+	}
 	
-	tab1.addEventListener('focus', function(_e) {
-		actionBar.setTitle('Hörspielkalender');
+	tabs[0].addEventListener('onCreateOptionsMenu', function() {
+		self.actionBar.setTitle('Hörspielkalender');
+		self.actionBar.setIcon('/images/appicon.png');
 	});
-	tab2.addEventListener('focus', function(_e) {
-		actionBar.setTitle('Alle Sender im Überblick');
-
+	tabs[1].addEventListener('onCreateOptionsMenu', function(_e) {
+		self.actionBar.setTitle('Alle Sender im Überblick');
+		self.actionBar.setIcon('/images/appicon.png');
 	});
-	tab3.addEventListener('focus', function(_e) {
-		actionBar.setTitle('Podcasts (auch zum Mitnehmen)');
-
+	tabs[2].addEventListener('focus', function(_e) {
+		self.actionBar.setTitle('Podcasts (auch zum Mitnehmen)');
+		self.actionBar.setIcon('/images/appicon.png');
 	});
-	tab4.addEventListener('focus', function(_e) {
-		actionBar.setTitle('Mein Radio');
-
+	tabs[3].addEventListener('focus', function(_e) {
+		self.actionBar.setTitle('Mein Radio');
+		self.actionBar.setIcon('/images/appicon.png');
 	});
-	tabGroup.open();
+	tabs[4].addEventListener('focus', function(_e) {
+		self.actionBar.setTitle('Hörspiel@Twitter');
+		self.actionBar.setIcon('/images/twitter.png');
+	});
+	tabs[4].addEventListener('onCreateOptionsMenu', function(e) {
+		if (e.actionBar) {
+		}
+		
+		e.menu.add({
+			title : "Nachladen",
+			icon: '/images/reload.png',
+			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+			itemId : 0
 
+		}).addEventListener("click", function() {
+			tabs[4].window.fireEvent('reload!');
+			e.activity.invalidateOptionsMenu();
+		});
+		e.menu.add({
+			title : "Einloggen",
+			icon: '/images/pencil.png',
+			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+			itemId : 101
+
+		}).addEventListener("click", function() {
+			tabs[4].window.fireEvent('write!');
+			//e.activity.invalidateOptionsMenu();
+			
+		});
+	});
+
+	self.open();
 };

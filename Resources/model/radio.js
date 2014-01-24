@@ -10,8 +10,11 @@ String.prototype.rtrim = function() {
 };
 
 var Radio = function() {
-	this.importList();
-	return this;
+	if (!(this instanceof Radio)) {
+		return new Radio();
+	}
+	return this.importList();
+
 };
 
 Radio.prototype.getMy = function() {
@@ -52,6 +55,7 @@ Radio.prototype.getMy = function() {
 			}
 			res.next();
 		}
+		link.close();
 		return list;
 	}
 	console.log('Warning: cannot link to DB');
@@ -185,6 +189,7 @@ Radio.prototype.importList = function() {
 			}
 		});
 	}
+	return this;
 };
 
 Radio.prototype.getPodcast = function(_args) {
@@ -212,6 +217,7 @@ Radio.prototype.getPodcast = function(_args) {
 		res.close();
 		return item;
 	}
+
 	if (true == Ti.Network.online) {
 		var xhr = Ti.Network.createHTTPClient({
 			ondatastream : function(e) {
@@ -231,7 +237,7 @@ Radio.prototype.getPodcast = function(_args) {
 				}).show();
 				for (var c = 0; c < items.length; c++) {
 					var item = items.item(c);
-					var title = Elem2Text(item, "title").replace(/&quot;/g,'"').replace(/#39;/g,'"');
+					var title = Elem2Text(item, "title").replace(/&quot;/g, '"').replace(/#39;/g, '"');
 					var duration = Elem2Text(item, "itunes:duration");
 					var author = Elem2Text(item, "itunes:author");
 					var pubdate = moment(Elem2Text(item, "pubDate")).format('LLLL');
