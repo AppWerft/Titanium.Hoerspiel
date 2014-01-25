@@ -72,7 +72,7 @@ TwitterAdapter.prototype.clearAccessToken = function() {
 // send a tweet (only if accesstoken is present)
 TwitterAdapter.prototype.addTweet = function(_args) {
 	if (!_args.tweet.match(/ndwhh/))
-		_args.tweet += ' #ndwhh';
+		_args.tweet += ' #Hörspiel';
 	this.cb.__call("statuses_update", {
 		"status" : _args.tweet
 	}, function(reply) {
@@ -90,7 +90,7 @@ TwitterAdapter.prototype.addTweet = function(_args) {
 
 TwitterAdapter.prototype.autorize = function(_callback) {
 	console.log('Info: starting with tweeting, test on tokens:');
-	this.clearAccessToken();
+	//this.clearAccessToken();
 	this.loadAccessToken();
 	if (this.accessTokenSecret != null && this.accessToken != null) {
 		this.cb.setToken(this.accessToken, this.accessTokenSecret);
@@ -146,6 +146,7 @@ TwitterAdapter.prototype.autorize = function(_callback) {
 						}, function(reply) {
 							self.cb.setToken(reply.oauth_token, reply.oauth_token_secret);
 							Ti.API.info(reply);
+
 							self.accessToken = reply.oauth_token;
 							self.accessTokenSecret = reply.oauth_token_secret;
 							self.saveAccessToken();

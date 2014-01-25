@@ -71,6 +71,6 @@
         <target device="tizen">false</target>
     </deployment-targets>
     <sdk-version>3.2.0.GA</sdk-version>
-	<property name="twitter.consumerkey">oPZ0BvXVMgADagcWPYzsg</property>
+    <property name="twitter.consumerkey">oPZ0BvXVMgADagcWPYzsg</property>
     <property name="twitter.consumersecret">uBPjIxmoT0pYw8WBnYb1r3jLjn4CiKoMs0T3feAgvs</property>
 </ti:app>

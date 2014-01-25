@@ -1066,30 +1066,7 @@ if (!Array.prototype.indexOf) {
 		 * @return object The XMLHttpRequest object instance
 		 */
 		var _getXmlRequestObject = function() {
-			var xml = null;
-			if (Titanium && Titanium.Network)
 				return Ti.Network.createHTTPClient();
-			if ( typeof window === "object" && window && typeof window.XMLHttpRequest === "function") {
-				xml = new window.XMLHttpRequest();
-			} else if ( typeof require === "function" && require) {
-				try {
-					var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-					xml = new XMLHttpRequest();
-				} catch (e1) {
-					try {
-						var XMLHttpRequest = require("xhr2");
-						xml = new XMLHttpRequest();
-					} catch (e2) {
-						console.error("xhr2 object not defined, trying ActiveXObject.");
-						try {
-							xml = new ActiveXObject("Microsoft.XMLHTTP");
-						} catch (e3) {
-							console.error("ActiveXObject object not defined, cancelling.");
-						}
-					}
-				}
-			}
-			return xml;
 		};
 
 		/**
