@@ -6,71 +6,69 @@ exports.create = function(_parent, _podcastlist) {
 		defaultItemTemplate : 'template',
 		backgroundImage : '/default.png'
 	});
+	var filesize = 0;
 	listView.progressview = require('ui/progress.widget').create();
 	var sections = [];
 	var PodCast = require('ui/podcast.widget');
 	listView.podcastwidget = new PodCast();
+	Ti.App.Model.getPodcast({
+		podcastlist : _podcastlist,
+		onprogress : function(e) {
+			listView.progressview.setProgress(e);
+			listView.progressview.setMessage('Bitte etwas Geduld.');
+		},
+		onload : function(_podcasts) {
+			filesize = _podcasts.filesize;
+			listView.progressview.hide();
+			var items = [];
+			for (var i = 0; i < _podcasts.podcasts.length; i++) {
+				var podcast = _podcasts.podcasts[i];
+				var item = {
+					properties : {
+						itemId : JSON.stringify(podcast),
+						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+					},
+					title : {
+						text : podcast.title
+					},
+					author : {
+						text : podcast.author
+					},
+					summary : {
+						text : podcast.summary
+					},
+					duration : {
+						text : 'Dauer: ' + podcast.duration
+					},
+					pubdate : {
+						text : 'Sendezeit: ' + podcast.pubdate
+					},
+					pict : {
+						image : podcast.pict
+					},
+					cached : {
+						image : (podcast.cached) ? '/images/cached.png' : '/images/nil.png'
+					},
+					faved : {
+						image : (podcast.faved) ? '/images/faved.png' : '/images/nil.png'
+					}
+				};
+				if (!podcast.summary)
+					item.summary.height = 0;
+				if (!podcast.author)
+					item.author.height = 0;
 
-	setTimeout(function() {
-		Ti.App.Model.getPodcast({
-			podcastlist : _podcastlist,
-			onprogress : function(e) {
-				listView.progressview.setProgress(e);
-				listView.progressview.setMessage('Bitte etwas Geduld.');
-
-			},
-			onload : function(_podcasts) {
-				listView.progressview.hide();
-				var items = [];
-				for (var i = 0; i < _podcasts.length; i++) {
-					var podcast = _podcasts[i];
-					var item = {
-						properties : {
-							itemId : JSON.stringify(podcast),
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-						},
-						title : {
-							text : podcast.title
-						},
-						author : {
-							text : podcast.author
-						},
-						summary : {
-							text : podcast.summary
-						},
-						duration : {
-							text : 'Dauer: ' + podcast.duration
-						},
-						pubdate : {
-							text : 'Sendezeit: ' + podcast.pubdate
-						},
-						pict : {
-							image : podcast.pict
-						},
-						cached : {
-							image : (podcast.cached) ? '/images/cached.png' : '/images/nil.png'
-						},
-						faved : {
-							image : (podcast.faved) ? '/images/faved.png' : '/images/nil.png'
-						}
-					};
-					if (!podcast.summary)
-						item.summary.height = 0;
-					if (!podcast.author)
-						item.author.height = 0;
-
-					items.push(item);
-				}
-				sections[0] = Ti.UI.createListSection({
-					//headerTitle : _podcast.channel.image.title,
-					items : items
-				});
-				listView.setSections(sections);
+				items.push(item);
 			}
-		});
-		listView.progressview.setTitle('Hole Podcastliste\n' + _podcastlist.title);
+			sections[0] = Ti.UI.createListSection({
+				//headerTitle : _podcast.channel.image.title,
+				items : items
+			});
+			listView.setSections(sections);
+		}
+	});
 		listView.progressview.show();
-	}, 10);
+		listView.progressview.setTitle('Hole Podcastliste\n' + _podcastlist.title);
 	_parent.add(listView.podcastwidget.getView());
 	_parent.add(listView.progressview);
 	listView.addEventListener('itemclick', function(e) {
@@ -126,6 +124,12 @@ exports.create = function(_parent, _podcastlist) {
 					});
 					listView.progressview.show();
 					listView.progressview.setMessage('Starte Herunterladen …');
+					break;
+				case 3:
+					Ti.App.Model.saveChannel({
+						filesize : filesize,
+						podcastlist : _podcastlist
+					});
 					break;
 				default:
 					Ti.UI.createNotification({

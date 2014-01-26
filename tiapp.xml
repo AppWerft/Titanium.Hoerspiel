@@ -2,7 +2,7 @@
 <ti:app xmlns:ti="http://ti.appcelerator.org">
     <id>de.appwerft.hoerspiel</id>
     <name>Hörspiel2Go</name>
-    <version>1.0</version>
+    <version>1.30</version>
     <publisher>rainerschleevoigt</publisher>
     <url>http://</url>
     <description>not specified</description>
@@ -43,7 +43,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="28" android:versionName="1.28">
+        <manifest android:versionCode="32" android:versionName="1.32">
             <uses-permission android:name="android.permission.INTERNET"/>
             <application android:largeHeap="true">
                 <activity android:configChanges="keyboardHidden"
@@ -66,11 +66,11 @@
         <target device="android">true</target>
         <target device="blackberry">false</target>
         <target device="ipad">false</target>
-        <target device="iphone">true</target>
+        <target device="iphone">false</target>
         <target device="mobileweb">false</target>
         <target device="tizen">false</target>
     </deployment-targets>
-    <sdk-version>3.2.0.GA</sdk-version>
+    <sdk-version>3.2.0.evalJSpatch</sdk-version>
     <property name="twitter.consumerkey">oPZ0BvXVMgADagcWPYzsg</property>
     <property name="twitter.consumersecret">uBPjIxmoT0pYw8WBnYb1r3jLjn4CiKoMs0T3feAgvs</property>
 </ti:app>

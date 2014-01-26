@@ -43,7 +43,6 @@ exports.create = function() {// this sets the background color of the master UIV
 	for (var i = 0; i < tabs.length; i++) {
 		self.addTab(tabs[i]);
 	}
-	
 	tabs[0].addEventListener('onCreateOptionsMenu', function() {
 		self.actionBar.setTitle('Hörspielkalender');
 		self.actionBar.setIcon('/images/appicon.png');
@@ -57,7 +56,7 @@ exports.create = function() {// this sets the background color of the master UIV
 		self.actionBar.setIcon('/images/appicon.png');
 	});
 	tabs[3].addEventListener('focus', function(_e) {
-		self.actionBar.setTitle('Mein Radio');
+		self.actionBar.setTitle('Mein Depot');
 		self.actionBar.setIcon('/images/appicon.png');
 	});
 	tabs[4].addEventListener('focus', function(_e) {
@@ -67,13 +66,11 @@ exports.create = function() {// this sets the background color of the master UIV
 	tabs[4].addEventListener('onCreateOptionsMenu', function(e) {
 		if (e.actionBar) {
 		}
-		
 		e.menu.add({
 			title : "Nachladen",
 			icon: '/images/reload.png',
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 0
-
 		}).addEventListener("click", function() {
 			tabs[4].window.fireEvent('reload!');
 			e.activity.invalidateOptionsMenu();
@@ -83,13 +80,10 @@ exports.create = function() {// this sets the background color of the master UIV
 			icon: '/images/pencil.png',
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 101
-
 		}).addEventListener("click", function() {
 			tabs[4].window.fireEvent('write!');
 			//e.activity.invalidateOptionsMenu();
-			
 		});
 	});
-
 	self.open();
 };

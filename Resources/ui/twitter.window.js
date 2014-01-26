@@ -3,7 +3,6 @@ exports.create = function() {
 		fullscreen : true,
 		backgroundColor : '#fff'
 	});
-
 	self.tweetList = Ti.UI.createTableView({
 		height : Ti.UI.FILL,
 		backgroundColor : '#fff'
@@ -49,50 +48,12 @@ exports.create = function() {
 	});
 	function updateTweetsOnGUI() {
 		Ti.App.Twitter.fetch('search_tweets', 'Hörspiel', function(_response) {
-			console.log('Info: tweets = ' +_response.statuses.length);
+			console.log('Info: tweets = ' + _response.statuses.length);
 			var rows = [];
 			for (var i = 0; i < _response.statuses.length; i++) {
 				var tweet = _response.statuses[i];
-				console.log(tweet.entities);
-				var row = Ti.UI.createTableViewRow({
-					user : tweet.user,
-					tweet : tweet.text,
-					hasChild : true,
-					height : Ti.UI.SIZE
-				});
-				row.add(Ti.UI.createLabel({
-					text : tweet.user.name + ', ' + tweet.user.location,
-					top : '5dp',
-					left : '100dp',
-					right : '5dp',
-					color : 'silver',
-					height : '24dp',
-					font : {
-						fontSize : '14dp'
+				var row = require('ui/twitter.tweet').create(tweet);
 
-					}
-				}));
-				row.add(Ti.UI.createLabel({
-					text : tweet.text,
-					top : '25dp',
-					bottom : '10dp',
-					left : '100dp',
-					right : '5dp',
-					color : 'black',
-					font : {
-						fontSize : '16dp'
-
-					},
-					height : Ti.UI.SIZE
-				}));
-				row.add(Ti.UI.createImageView({
-					left : 0,
-					width : '70dp',
-					height : '70dp',
-					top : '10dp',
-					image : tweet.user.profile_image_url
-
-				}));
 				rows.push(row);
 			}
 			self.tweetList.setData(rows);
@@ -111,20 +72,19 @@ exports.create = function() {
 	 }
 	 });
 	 });*/
-	self.addEventListener('focus', function() {
-		updateTweetsOnGUI();
-	});
+
 	self.addEventListener('reload!', function() {
 		updateTweetsOnGUI();
 	});
+	self.dialog = require('ui/tweet.dialog').create();
 	self.addEventListener('write!', function() {
 		Ti.App.Twitter.autorize(function(_reply) {
 			if (_reply.success == true) {
-				var tweetWin = require('ui/tweet.window').create();
-				tweetWin.open();
+				self.dialog.show();
 			}
 		});
 	});
+	updateTweetsOnGUI();
 	return self;
 };
 

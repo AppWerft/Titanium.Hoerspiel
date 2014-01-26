@@ -14,7 +14,9 @@ exports.create = function() {
 		height : '100dp'
 	}));
 	self.container = Ti.UI.createView({
-		bottom : 0,left:'10dp',right:'10dp',
+		bottom : 0,
+		left : '10dp',
+		right : '10dp',
 		layout : 'vertical',
 		height : '100dp'
 	});
@@ -22,14 +24,15 @@ exports.create = function() {
 	self.title = Ti.UI.createLabel({
 		color : 'white',
 		top : '5dp',
-		height : '40dp',width:Ti.UI.FILL,
+		height : '40dp',
+		width : Ti.UI.FILL,
 		font : {
 			fontWeight : 'bold',
 			fontSize : '16dp'
 		}
 	});
 	self.container.add(self.title);
-	
+
 	self.progress = Ti.UI.createProgressBar({
 		width : '100%',
 		min : 0,
@@ -40,12 +43,20 @@ exports.create = function() {
 	self.container.add(self.progress);
 	self.progress.show();
 	self.message = Ti.UI.createLabel({
-		color : 'white',width:Ti.UI.FILL,
-		top : '10dp',textAlign:'left',
+		color : 'white',
+		width : Ti.UI.FILL,
+		top : '10dp',
+		textAlign : 'left',
 		font : {
 			fontSize : '10dp'
 		}
 	});
+	self.actind = Ti.UI.createActivityIndicator({
+		left : '5dp',
+		style : Titanium.UI.ActivityIndicatorStyle.PLAIN
+	});
+	self.container.add(self.actind);
+	self.actind.show();
 	self.container.add(self.message);
 	self.setProgress = function(e) {
 		self.progress.setValue(e);

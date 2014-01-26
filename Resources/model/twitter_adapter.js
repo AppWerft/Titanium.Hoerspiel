@@ -3,7 +3,6 @@ var TwitterAdapter = function(_options) {
 	return this;
 };
 
-
 // Init with application only authorization (bearer)
 TwitterAdapter.prototype.init = function(_options) {
 	this.service = _options && _options.service || 'twitter';
@@ -68,7 +67,6 @@ TwitterAdapter.prototype.clearAccessToken = function() {
 };
 // End of Helpers
 
-
 // send a tweet (only if accesstoken is present)
 TwitterAdapter.prototype.addTweet = function(_args) {
 	if (!_args.tweet.match(/ndwhh/))
@@ -110,9 +108,11 @@ TwitterAdapter.prototype.autorize = function(_callback) {
 			self.cb.setToken(reply.oauth_token, reply.oauth_token_secret);
 			self.cb.__call("oauth_authorize", {}, function(auth_url) {
 				var win = Ti.UI.createWindow({
-					modal : true,
-					width : Ti.UI.FILL,
-					height : Ti.UI.FILL,
+					fullscreen : true,
+					enableZoomControls : false,
+					disableBounce : true,
+					modal : true,navBarHidden:true,
+					hideLoadIndicator : true,
 					transform : Ti.UI.create2DMatrix({
 						scale : 0.95
 					})
@@ -136,9 +136,7 @@ TwitterAdapter.prototype.autorize = function(_callback) {
 					}
 				};
 				var authorizeUICallback = function(e) {
-					Ti.API.info('Info: authorizeUILoaded' + webView.html);
 					var val = webView.evalJS('window.document.querySelector(\'kbd[aria-labelledby="code-desc"] > code\').innerHTML');
-					Ti.API.info(val);
 					if (val) {
 						destroyAuthorizeUI();
 						self.cb.__call("oauth_accessToken", {

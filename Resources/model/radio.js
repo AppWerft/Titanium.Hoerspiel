@@ -8,7 +8,6 @@ String.prototype.ltrim = function() {
 String.prototype.rtrim = function() {
 	return this.replace(/\s+$/, "");
 };
-
 var Radio = function() {
 	if (!(this instanceof Radio)) {
 		return new Radio();
@@ -16,7 +15,6 @@ var Radio = function() {
 	return this.importList();
 
 };
-
 Radio.prototype.getMy = function() {
 	var link = Ti.Database.open(RADIOLIST);
 	var list = {
@@ -109,6 +107,35 @@ Radio.prototype.favMy = function(_args) {
 	db.close();
 
 };
+
+Radio.prototype.saveChannel = function(_podcasts) {
+	console.log(_podcasts);
+	var id = Ti.Utils.md5HexDigest(_podcasts.podcastlist.feed);
+	var db = Ti.Database.open(RADIOLIST);
+	var res = db.execute('SELECT count(*) as total FROM channels WHERE id=?', id);
+	var now = (new Date).getTime();
+	if (res.isValidRow()) {
+		var total = res.fieldByName('total');
+		console.log('Info: ' + total + ' gefunden');
+	}
+	//(id , title , station , logo , url , lastentry , filesize )
+	if (!total)
+		db.execute('INSERT INTO channels VALUES (?,?,?,?,?,?,?,?,0)', id, _podcasts.podcastlist.title, _podcasts.podcastlist.station, _podcasts.podcastlist.logo, _podcasts.podcastlist.feed, '', _podcasts.filesize, (new Date()).getTime());
+	db.close();
+};
+
+Radio.prototype.getChannels = function() {
+	var db = Ti.Database.open(RADIOLIST);
+	var res = db.execute('SELECT * FROM channels WHERE id=?', id);
+	var now = (new Date).getTime();
+	if (res.isValidRow()) {
+		var total = res.fieldByName('total');
+		console.log('Info: ' + total + ' gefunden');
+	}
+	//(id , title , station , logo , url , lastentry , filesize )
+	db.close();
+};
+
 Radio.prototype.recentMy = function(_args) {
 	var id = Ti.Utils.md5HexDigest(_args.podcast.media);
 	var db = Ti.Database.open(RADIOLIST);
@@ -137,8 +164,9 @@ Radio.prototype.importList = function() {
 		link.execute('CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime INTEGER, mtime INTEGER, count INTEGER,faved INTEGER, localcached INTEGER)');
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
+		link.execute('CREATE TABLE IF NOT EXISTS channels (id TEXT, title TEXT, station TEXT, logo TEXT, url TEXT, lastentry NUMERIC, filesize NUMERIC, ctime NUMERIC, done NUMERIC)');
 		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
-		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT,livestreamurl TEXT)');
+		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT, livestreamurl TEXT)');
 		console.log('Info:db installed/opened, now import begins');
 		link.execute('BEGIN');
 		// Sendergruppen
@@ -224,8 +252,9 @@ Radio.prototype.getPodcast = function(_args) {
 				_args.onprogress(e.progress);
 			},
 			onload : function() {
+				var filesize = this.getResponseHeader('Content-Length');
 				Ti.Android && Ti.UI.createNotification({
-					message : 'Podcastliste empfangen. (' + Math.round(this.responseText.length / 1000) + 'kB)'
+					message : 'Podcastliste empfangen. (' + Math.round(filesize / 1000) + 'kB)'
 				});
 				var moment = require('vendor/moment');
 				moment.lang('de');
@@ -271,7 +300,10 @@ Radio.prototype.getPodcast = function(_args) {
 						pict : (res) ? res[1] : '/images/' + _args.podcastlist.station + '.png'
 					});
 				}
-				_args.onload(podcasts);
+				_args.onload({
+					podcasts : podcasts,
+					filesize : filesize
+				});
 				link.close();
 
 			}
