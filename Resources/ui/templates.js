@@ -1,4 +1,4 @@
-
+var fontFamily =  (Ti.Android) ? 'Droid Sans' : 'Helvetica Neue';
 exports.timelineactiveTemplate = {
 	properties : {
 		height : '100dip',
@@ -29,7 +29,7 @@ exports.timelineactiveTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily,
 				fontWeight : 'bold',
 				fontSize : '18dp',
 			},
@@ -43,7 +43,7 @@ exports.timelineactiveTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily,
 				fontSize : '14dp',
 			},
 			bottom : '10dp',
@@ -91,7 +91,7 @@ exports.timelinepassiveTemplate = {
 			color : '#333',
 			opacity : 0.8,
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily,
 				fontWeight : 'bold',
 				fontSize : '18dp',
 			},
@@ -105,7 +105,7 @@ exports.timelinepassiveTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily,
 				fontSize : '14dp',
 			},
 			top : '36dp',
@@ -132,7 +132,7 @@ exports.listTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily ,
 				fontSize : '18dp',
 			},
 			left : '70dip',
@@ -150,7 +150,7 @@ exports.podcastsTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily ,
 				fontSize : '18dp',
 				fontWeight : 'bold'
 			},
@@ -171,7 +171,7 @@ exports.podcastsTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : 'Helvetica',
+				fontFamily : fontFamily ,
 				fontSize : '14dp',
 
 			},
@@ -232,7 +232,7 @@ exports.podcastTemplate = {
 				color : '#666',
 				top : '5dp',
 				font : {
-					fontFamily : 'Helvetica',
+					fontFamily : fontFamily,
 					fontSize : '18dp',
 					fontWeight : 'bold'
 				},
@@ -248,7 +248,7 @@ exports.podcastTemplate = {
 				top : 0,
 				height : Ti.UI.SIZE,
 				font : {
-					fontFamily : 'Helvetica',
+					fontFamily : fontFamily,
 					fontSize : '14dp',
 				},
 				left : '80dip',
@@ -263,7 +263,7 @@ exports.podcastTemplate = {
 				top : 0,
 				height : Ti.UI.SIZE,
 				font : {
-					fontFamily : 'Helvetica',
+					fontFamily : fontFamily,
 					fontSize : '14dp',
 				},
 				left : '80dip',
@@ -277,7 +277,7 @@ exports.podcastTemplate = {
 				color : '#333',
 				top : '2dp',
 				font : {
-					fontFamily : 'Helvetica',
+					fontFamily :fontFamily,
 					fontSize : '10dp',
 				},
 				left : '80dip',
@@ -291,7 +291,7 @@ exports.podcastTemplate = {
 				color : '#333',
 				top : '0dp',
 				font : {
-					fontFamily : 'Helvetica',
+					fontFamily : fontFamily ,
 					fontSize : '12dp',
 				},
 				left : '80dip',

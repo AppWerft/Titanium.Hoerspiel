@@ -15,6 +15,29 @@ var Radio = function() {
 	return this.importList();
 
 };
+
+Radio.prototype.resolvePlaylist = function(_args) {
+	var uri_pattern = /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))/ig;
+	var xhr = Ti.Network.createHTTPClient({
+		onload : function() {
+			var foo = this.responseText.split('\n');
+			var bar = [];
+			for (var i = 0; i < foo.length; i++) {
+				if (foo[i][0] == '#')
+					continue;
+				var uri = foo[i].match(uri_pattern);
+				if (uri)
+					bar.push(uri);
+			}
+			console.log(_args.playlist);
+			console.log(bar[0][0]);
+
+			_args.onload(bar[0][0]);
+		}
+	});
+	xhr.open('GET', _args.playlist);
+	xhr.send();
+};
 Radio.prototype.getMy = function() {
 	var link = Ti.Database.open(RADIOLIST);
 	var list = {
@@ -189,7 +212,7 @@ Radio.prototype.importList = function() {
 							var start = 60 * parseInt(tmp[0]) + parseInt(tmp[1]);
 							var stop = start + parseInt(termine[t].dauer);
 							link.execute('INSERT INTO termine VALUES (?,?,?,?,?,?,?)', termine[t].tag, start, stop, sendungen[s].name, sender.id, sendungen[s].id, sender.livestream.url);
-
+							//DEBUG      self.resolvePlaylist(sender.livestream.url);
 							//		console.log('wd='+termine[t].tag+' start='+start+ ' stop=' +stop);
 						}
 					}
@@ -330,7 +353,7 @@ Radio.prototype.getSendungen = function() {
 			mm = '0' + mm;
 		var duration = res.fieldByName('stop') - res.fieldByName('start');
 		return {
-			livestreamurl : res.fieldByName('livestreamurl'),
+			media : res.fieldByName('livestreamurl'),
 			start : hh + ':' + mm,
 			duration : duration,
 			senderid : res.fieldByName('senderid'),

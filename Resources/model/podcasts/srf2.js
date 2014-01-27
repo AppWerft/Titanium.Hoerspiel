@@ -8,23 +8,25 @@ exports.get = function(_callback) {
 		Ti.Yahoo.yql(yql, function(e) {
 			if (e.success) {
 				var feeds = [];
-				console.log(e.data);
-				for (var i = 0; i < e.data.li.length; i++) {
-					var feed = e.data.li[i];
-					var node = (isArray(feed.div.div)) ? feed.div.div[0] : feed.div.div;
-					try {
-						feeds.push({
-							feed : node.ul.li[0].div.input.value,
-							station : 'srf2',
-							title : feed.div.h3.a.content,
-							summary : feed.div.p
-						});
-					} catch(E) {
+				if (e.data) {
+					for (var i = 0; i < e.data.li.length; i++) {
+						var feed = e.data.li[i];
+						var node = (isArray(feed.div.div)) ? feed.div.div[0] : feed.div.div;
+						try {
+							feeds.push({
+								feed : node.ul.li[0].div.input.value,
+								station : 'srf2',
+								title : feed.div.h3.a.content,
+								summary : feed.div.p
+							});
+						} catch(E) {
+						}
 					}
+					Ti.App.Properties.setList('srf2', feeds);
 				}
-				_callback(feeds);
+				_callback(Ti.App.Properties.hasProperty('srf2') && Ti.App.Properties.getList('srf2'));
 			} else {
-				console.log('Error: srf2');
+
 			}
 		});
 	}

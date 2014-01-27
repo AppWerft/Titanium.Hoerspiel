@@ -13,4 +13,4 @@ webview.addEventListener('load', function(e) {
  Ti.App.Twitter = new (require('model/twitter_adapter'))();
  require('ui/tabgroup').create();
  })();
-Ti.UI.Android.openPreferences();
+//

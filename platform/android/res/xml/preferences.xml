@@ -1,31 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="Preferences">
-  <PreferenceScreen
-      android:title="Misc. Preferences"
-      android:summary="Click to see more options">
-    <EditTextPreference
-      android:title="Edit Text Preference"
-      android:summary="You may enter a string"
-      android:defaultValue=""
-      android:key="editText" />
-  </PreferenceScreen>
-  <PreferenceCategory android:title="Category One">
+    android:title="Einstellungen für Hörspiel2Go">
+ 
+  <PreferenceCategory android:title="Anonymität">
     <CheckBoxPreference
-      android:title="CheckBox Preference"
+      android:title="Eigenen Standort veröffentlichen"
       android:defaultValue="false"
-      android:summary="You may enter a boolean"
+      android:summary="Wenn der eigene Standort freigegeben ist, wird auf einer Karte angezeigt, welcher Sender wo gerade gehört wird"
       android:key="checkbox" />
-    <RingtonePreference
-      android:title="Ringtone Preference"
-      android:summary="You may pick a ringtone"
-      android:defaultValue=""
-      android:key="ringtone" />
   </PreferenceCategory>
-  <PreferenceCategory android:title="Category Two">
+  <PreferenceCategory android:title="Speicherverbrauch">
     <ListPreference
-      android:title="List Preference"
-      android:summary="You may chose from multiple choices"
+      android:title="maximaler Speichergröße"
+      android:summary="Lege hier fest wieviel Speicher Du für das lokale Abspeichen der Audiofiles verbrauchen möchtest."
       android:key="list" 
     android:entries="@array/listNames"
     android:entryValues="@array/listValues" 

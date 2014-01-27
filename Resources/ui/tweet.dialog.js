@@ -51,7 +51,7 @@ exports.create = function() {
 	self.addEventListener('click', function(_e) {
 		if (_e.index == 1)
 			Ti.App.Twitter.addTweet({
-				tweet : self.input.getValue(),
+				tweet : input.getValue(),
 				ontweeted : function() {
 					self.fireEvent('tweeted');
 				}

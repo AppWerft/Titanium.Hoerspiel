@@ -2,7 +2,7 @@
 <ti:app xmlns:ti="http://ti.appcelerator.org">
     <id>de.appwerft.hoerspiel</id>
     <name>Hörspiel2Go</name>
-    <version>1.30</version>
+    <version>1.34</version>
     <publisher>rainerschleevoigt</publisher>
     <url>http://</url>
     <description>not specified</description>
@@ -43,7 +43,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="32" android:versionName="1.32">
+        <manifest android:versionCode="35" android:versionName="1.35">
             <uses-permission android:name="android.permission.INTERNET"/>
             <application android:largeHeap="true">
                 <activity android:configChanges="keyboardHidden"

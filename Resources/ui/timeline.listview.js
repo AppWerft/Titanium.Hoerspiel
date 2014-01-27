@@ -84,13 +84,12 @@ exports.create = function(_parent) {
 	};
 	_parent.add(listView);
 
-	var Radio = require('ui/radio.widget');
-	listView.radiowidget = new Radio();
+	listView.radiowidget = new (require('ui/radio.widget'))();
 	_parent.add(listView.radiowidget.getView());
 	listView.addEventListener('itemclick', function(e) {
-		var item = e.section.getItemAt(e.itemIndex);
-		listView.radiowidget.togglePlay(JSON.parse(e.itemId));
-		//e.section.updateItemAt(e.itemIndex, item);
+		var options = JSON.parse(e.itemId);
+		options.isplaylisturl = true;
+		listView.radiowidget.togglePlay(options);
 
 	});
 	listView.cron = setInterval(function() {

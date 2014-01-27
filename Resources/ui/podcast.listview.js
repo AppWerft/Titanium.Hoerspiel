@@ -8,9 +8,9 @@ exports.create = function(_parent, _podcastlist) {
 	});
 	var filesize = 0;
 	listView.progressview = require('ui/progress.widget').create();
+	listView.podcastwidget = new (require('ui/radio.widget'))();
 	var sections = [];
 	var PodCast = require('ui/podcast.widget');
-	listView.podcastwidget = new PodCast();
 	Ti.App.Model.getPodcast({
 		podcastlist : _podcastlist,
 		onprogress : function(e) {
@@ -67,13 +67,13 @@ exports.create = function(_parent, _podcastlist) {
 			listView.setSections(sections);
 		}
 	});
-		listView.progressview.show();
-		listView.progressview.setTitle('Hole Podcastliste\n' + _podcastlist.title);
-	_parent.add(listView.podcastwidget.getView());
+	listView.progressview.show();
+	listView.progressview.setTitle('Hole Podcastliste\n' + _podcastlist.title);
 	_parent.add(listView.progressview);
+	_parent.add(listView.podcastwidget.getView());
+
 	listView.addEventListener('itemclick', function(e) {
 		var item = e.section.getItemAt(e.itemIndex);
-		console.log(item);
 		var podcast = JSON.parse(e.itemId);
 		//var state = Ti.App.Model.getMy(podcast);
 		var opts = {

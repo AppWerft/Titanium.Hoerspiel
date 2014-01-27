@@ -22,8 +22,7 @@ exports.create = function() {// this sets the background color of the master UIV
 	self.addEventListener('focus', function(e) {
 		self.getActivity().invalidateOptionsMenu();
 	});
-	
-	
+
 	var tabs = [Ti.UI.createTab({
 		title : '>> on Air',
 		window : require('ui/timeline.window').create()
@@ -55,20 +54,31 @@ exports.create = function() {// this sets the background color of the master UIV
 		self.actionBar.setTitle('Podcasts (auch zum Mitnehmen)');
 		self.actionBar.setIcon('/images/appicon.png');
 	});
-	tabs[3].addEventListener('focus', function(_e) {
-		self.actionBar.setTitle('Mein Depot');
-		self.actionBar.setIcon('/images/appicon.png');
-	});
-	tabs[4].addEventListener('focus', function(_e) {
-		self.actionBar.setTitle('Hörspiel@Twitter');
-		self.actionBar.setIcon('/images/twitter.png');
+
+	tabs[3].addEventListener('onCreateOptionsMenu', function(e) {
+		if (e.actionBar) {
+			self.actionBar.setTitle('Mein Depot');
+			self.actionBar.setIcon('/images/appicon.png');
+		}
+		e.menu.add({
+			title : "Einstellungen",
+			icon : '/images/preferences.png',
+			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+			itemId : 1
+		}).addEventListener("click", function() {
+			Ti.UI.Android.openPreferences();
+			//e.activity.invalidateOptionsMenu();
+		});
+
 	});
 	tabs[4].addEventListener('onCreateOptionsMenu', function(e) {
 		if (e.actionBar) {
+			self.actionBar.setTitle('Hörspiel@Twitter');
+			self.actionBar.setIcon('/images/twitter.png');
 		}
 		e.menu.add({
 			title : "Nachladen",
-			icon: '/images/reload.png',
+			icon : '/images/reload.png',
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 0
 		}).addEventListener("click", function() {
@@ -77,7 +87,7 @@ exports.create = function() {// this sets the background color of the master UIV
 		});
 		e.menu.add({
 			title : "Einloggen",
-			icon: '/images/pencil.png',
+			icon : '/images/pencil.png',
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 101
 		}).addEventListener("click", function() {
