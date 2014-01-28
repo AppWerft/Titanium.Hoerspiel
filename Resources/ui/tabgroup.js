@@ -30,14 +30,14 @@ exports.create = function() {// this sets the background color of the master UIV
 		title : 'Radiosender',
 		window : require('ui/stations.window').create()
 	}), Ti.UI.createTab({
-		title : 'alle Podcasts',
+		title : 'Podcasts',
 		window : require('ui/podcasts.window').create()
 	}), Ti.UI.createTab({
-		title : 'mein Radio',
+		title : 'Depot',
 		window : require('ui/myradio.window').create()
 	}), Ti.UI.createTab({
 		title : 'Twitter',
-		window : require('ui/twitter.window').create()
+		window : require('ui/twitter/start.window').create()
 	})];
 	for (var i = 0; i < tabs.length; i++) {
 		self.addTab(tabs[i]);

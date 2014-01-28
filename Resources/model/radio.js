@@ -38,12 +38,17 @@ Radio.prototype.resolvePlaylist = function(_args) {
 	xhr.open('GET', _args.playlist);
 	xhr.send();
 };
+Radio.prototype.getChannels = function() {
+	return [];
+};
+
 Radio.prototype.getMy = function() {
 	var link = Ti.Database.open(RADIOLIST);
 	var list = {
 		faved : [],
 		cached : [],
-		recent : []
+		recent : [],
+		channels : []
 	};
 	if (link) {
 		var res = link.execute('SELECT * FROM myfavsandsaves ORDER BY mtime DESC');

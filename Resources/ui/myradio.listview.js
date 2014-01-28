@@ -1,8 +1,15 @@
 exports.create = function(_type) {
 	function updateList() {
-		var podcasts = Ti.App.Model.getMy()[_type.key];
+		switch (_type) {
+			case 'channels':
+				var podcasts = Ti.App.Model.getChannels();
+				break;
+			default:
+				var podcasts = Ti.App.Model.getMy()[_type.key];
+				break;
+		}
+
 		var items = [];
-		console.log(podcasts);
 		for (var i = 0; i < podcasts.length; i++) {
 			var podcast = podcasts[i];
 			items.push({

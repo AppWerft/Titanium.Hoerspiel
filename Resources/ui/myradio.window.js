@@ -4,13 +4,16 @@ exports.create = function() {
 	});
 	var types = [{
 		key : 'cached',
-		title : 'lokale Podcast'
+		title : 'Offline - Podcast'
 	}, {
 		key : 'faved',
-		title : 'Lieblinge'
+		title : 'Lieblingspodcasts'
 	}, {
 		key : 'recent',
-		title : 'Letztgehört'
+		title : 'Letztgehörte Beiträge'
+	}, {
+		key : 'channels',
+		title : 'Vorgemerkte 	Kanäle'
 	}];
 	var listviews = [];
 	for (var i = 0; i < types.length; i++) {
@@ -22,7 +25,7 @@ exports.create = function() {
 		backgroundColor : 'white'
 	});
 	self.add(self.scrollableView);
-	var navitexts = ['✦ ● ●', '● ✦ ●', '● ● ✦'];
+	var navitexts = ['✦ ● ● ●', '● ✦ ● ●', '● ● ✦ ●','● ● ● ✦'];
 	var navi = Ti.UI.createLabel({
 		bottom : 0,
 		height : '20dp',

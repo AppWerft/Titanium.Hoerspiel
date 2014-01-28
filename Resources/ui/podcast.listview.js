@@ -130,6 +130,9 @@ exports.create = function(_parent, _podcastlist) {
 						filesize : filesize,
 						podcastlist : _podcastlist
 					});
+					Ti.Android && Ti.UI.createNotification({
+						message : 'Kanal vorgemerkt.'
+					}).show();
 					break;
 				default:
 					Ti.UI.createNotification({
