@@ -39,7 +39,7 @@
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleDefault</string>
             </dict>
-        </plist>
+        </plist>  
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
