@@ -3,19 +3,33 @@
     android:title="Einstellungen für Hörspiel2Go">
  
   <PreferenceCategory android:title="Anonymität">
-    <CheckBoxPreference
-      android:title="Eigenen Standort veröffentlichen"
+    <SwitchPreference
+      android:title="Eigenen Standort"
       android:defaultValue="false"
       android:summary="Wenn der eigene Standort freigegeben ist, wird auf einer Karte angezeigt, welcher Sender wo gerade gehört wird"
       android:key="checkbox" />
   </PreferenceCategory>
+  
   <PreferenceCategory android:title="Speicherverbrauch">
     <ListPreference
       android:title="maximaler Speichergröße"
-      android:summary="Lege hier fest wieviel Speicher Du für das lokale Abspeichen der Audiofiles verbrauchen möchtest."
-      android:key="list" 
+      android:summary="Lege hier fest wieviel Speicher Du für das lokale Abspeichen der Audiofiles verbrauchen möchtest. In der Liste kann man mit langem Drücken löschen."
+      android:key="maxmem" 
+      android:defaultValue="900"
     android:entries="@array/listNames"
     android:entryValues="@array/listValues" 
     />
+  </PreferenceCategory>
+  <PreferenceCategory android:title="Netzwerk">
+    <SwitchPreference
+      android:title="Mobile Warnung"
+      android:defaultValue="false"
+      android:summary="Wenn freiimfelde kein WLAN ist, dann gibt es vor dem Abspielen eine Nachfrage."
+      android:key="mobilewarning" />
+    <CheckBoxPreference
+      android:title="Download nur im WLAN"
+      android:defaultValue="false"
+      android:summary="Du kannst Hörstücke mitnehmen. Das Abspeichern passiert normalerweise im WLAN. Das kannst Du darauf beschränken"
+      android:key="downloadonlywifi" />
   </PreferenceCategory>
 </PreferenceScreen>

@@ -8,12 +8,42 @@ String.prototype.ltrim = function() {
 String.prototype.rtrim = function() {
 	return this.replace(/\s+$/, "");
 };
+
+var getFilehandle = function(filename) {
+	var dir = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, 'cachefolder') : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'cachefolder');
+	if (!dir.exists()) {
+		dir.createDirectory('cachefolder');
+	};
+	if (filename)
+		return Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, 'cachefolder', filename) : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'cachefolder', filename);
+	return Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, 'cachefolder') : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'cachefolder');
+
+};
+
 var Radio = function() {
 	if (!(this instanceof Radio)) {
 		return new Radio();
 	}
 	return this.importList();
+};
 
+Radio.prototype.getQuota = function() {
+	var dir = getFilehandle();
+	var files = dir.getDirectoryListing();
+	var filesize = 0;
+	var maxmem = Ti.App.Properties.getString('maxmem') || 900;
+	if (files) {
+		for (var i = 0; i < files.length; i++) {
+			filesize += (getFilehandle(files[i]).size) / 1000000;
+		}
+		var res = {
+			maxmem : maxmem,
+			filesize : filesize,
+			quota : filesize / maxmem
+		};
+		console.log(res);
+	} else
+		return null;
 };
 
 Radio.prototype.resolvePlaylist = function(_args) {
@@ -42,6 +72,9 @@ Radio.prototype.getChannels = function() {
 	return [];
 };
 
+Radio.prototype.getAllFiles = function() {
+
+};
 Radio.prototype.getMy = function() {
 	var link = Ti.Database.open(RADIOLIST);
 	var list = {
@@ -93,7 +126,7 @@ Radio.prototype.saveMy = function(_args) {
 	var xhr = Ti.Network.createHTTPClient({
 		onload : function() {
 			var db = Ti.Database.open(RADIOLIST);
-			var fh = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, id) : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, id);
+			var fh = getFilehandle(id);
 			fh.write(this.responseData);
 			var res = db.execute('SELECT count(*) as total FROM myfavsandsaves WHERE id=?', id);
 			var now = (new Date).getTime();
@@ -188,7 +221,6 @@ Radio.prototype.importList = function() {
 	function importIntoDB(groups) {
 		//var link = Ti.Database.install('/model/radio.sql',RADIOLIST);
 		var link = Ti.Database.open(RADIOLIST);
-
 		link.execute('CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime INTEGER, mtime INTEGER, count INTEGER,faved INTEGER, localcached INTEGER)');
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
@@ -240,8 +272,9 @@ Radio.prototype.importList = function() {
 		var yql = 'SELECT * FROM xml WHERE url="' + Ti.App.Properties.getString('radiourl') + '"';
 		Ti.Yahoo.yql(yql, function(e) {
 			if (e.success) {
-				var groups = e.data.senderliste.senderfamilie;
-				importIntoDB(groups);
+				if (e.data.senderliste) {
+					importIntoDB(e.data.senderliste.senderfamilie);
+				}
 			}
 		});
 	}

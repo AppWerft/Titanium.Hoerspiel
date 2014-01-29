@@ -57,7 +57,7 @@ exports.create = function() {// this sets the background color of the master UIV
 
 	tabs[3].addEventListener('onCreateOptionsMenu', function(e) {
 		if (e.actionBar) {
-			self.actionBar.setTitle('Mein Depot');
+			self.actionBar.setTitle('Mein Podcast-Depot');
 			self.actionBar.setIcon('/images/appicon.png');
 		}
 		e.menu.add({

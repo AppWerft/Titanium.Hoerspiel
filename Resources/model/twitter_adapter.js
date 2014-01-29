@@ -86,7 +86,7 @@ TwitterAdapter.prototype.addTweet = function(_args) {
 	});
 };
 
-TwitterAdapter.prototype.autorize = function(_callback) {
+TwitterAdapter.prototype.authorize = function(_callback) {
 	console.log('Info: starting with tweeting, test on tokens:');
 	//this.clearAccessToken();
 	this.loadAccessToken();

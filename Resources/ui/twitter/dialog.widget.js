@@ -1,14 +1,11 @@
 exports.create = function(_e) {
 	function getContenttype(_url, _callback) {
-		console.log('Info: Start ' + _url);
 		var xhr = Ti.Network.createHTTPClient({
 			autoRedirect : true,
 			onerror : function() {
 				console.log('Error');
 			},
 			onload : function() {
-
-				console.log(this.getAllResponseHeaders());
 				var type = this.getResponseHeader('Content-Type');
 				if (type)
 					_callback(type.split('/')[0]);
@@ -24,18 +21,7 @@ exports.create = function(_e) {
 	var options = ['Twitter-Profil'];
 	if (uri != null) {
 		getContenttype(uri[0], function(_type) {
-			console.log(_type);
-			if (_type == 'audio') {
-				dialog.hide();
-				dialog = null;
-				options[1] = 'externer Audio-Link';
-				var dialog = Ti.UI.createOptionDialog({
-					options : options,
-					audio : true,
-					title : tweetdata.user.name
-				});
-				dialog.show();
-			};
+			
 		});
 		options.push('externer Web-Link');
 

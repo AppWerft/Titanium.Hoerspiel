@@ -20,12 +20,14 @@ exports.get = function(_callback) {
 								summary : feed.div.p
 							});
 						} catch(E) {
+							console.log(E);
 						}
 					}
 					Ti.App.Properties.setList('srf2', feeds);
 				}
 				_callback(Ti.App.Properties.hasProperty('srf2') && Ti.App.Properties.getList('srf2'));
 			} else {
+				_callback(Ti.App.Properties.hasProperty('srf2') && Ti.App.Properties.getList('srf2'));
 
 			}
 		});

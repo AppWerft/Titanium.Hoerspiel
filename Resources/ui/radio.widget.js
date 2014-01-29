@@ -11,7 +11,7 @@ var Radio = function() {
 	this.radiocontainer = Ti.UI.createView({
 		width : W,
 		height : HH,
-		zIndex : 9999,
+		zIndex : 99999,
 		backgroundColor : 'black',
 		bottom : '-' + HH
 	});
@@ -83,11 +83,13 @@ Radio.prototype.getView = function() {
 };
 
 Radio.prototype.togglePlay = function(_options) {
-	console.log('Info: togglePlay to ' + _options.media);
 	var media = _options.media;
+	
 	var senderlongname = _options.senderlongname || _options.title;
-	if (senderlongname == this.last.name)
+	if (senderlongname == this.last.name) {
+		console.log('Warning: same station:' + senderlongname +'|'+this.last.name);
 		return;
+	}
 	if (Ti.App.audioPlayer.playing == true) {
 		Ti.App.audioPlayer.stop();
 		Ti.Android && Ti.App.audioPlayer.release();
@@ -95,7 +97,7 @@ Radio.prototype.togglePlay = function(_options) {
 		//	this.radiocontainer.remove(this.animatedvolumemeter);
 		//	this.url = _livestreamplaylisturl;
 	}
-	if (this.last.url && this.last.url == media) {
+	if (this.last.url && this.last.url === media) {
 		this.radiocontainer.animate({
 			bottom : '-' + HH
 		});

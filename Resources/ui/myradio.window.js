@@ -1,7 +1,11 @@
 exports.create = function() {
+	function togglePlay(_podcast) {
+		self.podcastwidget.togglePlay(_podcast);
+	}
 	var self = Ti.UI.createWindow({
 		backgroundImage : 'default.png'
 	});
+	self.podcastwidget = new (require('ui/radio.widget'))();
 	var types = [{
 		key : 'cached',
 		title : 'Offline - Podcast'
@@ -13,19 +17,26 @@ exports.create = function() {
 		title : 'Letztgehörte Beiträge'
 	}, {
 		key : 'channels',
-		title : 'Vorgemerkte 	Kanäle'
+		title : 'Vorgemerkte Kanäle'
 	}];
 	var listviews = [];
 	for (var i = 0; i < types.length; i++) {
-		listviews.push(require('ui/myradio.listview').create(types[i]));
+
+		listviews.push(require('ui/myradio.listview').create({
+			type : types[i],
+			onclick : togglePlay
+		}));
+		listviews[i].update();
 	}
+
 	self.scrollableView = Ti.UI.createScrollableView({
 		bottom : '20dp',
 		views : listviews,
+		showPagingControl : true,
 		backgroundColor : 'white'
 	});
 	self.add(self.scrollableView);
-	var navitexts = ['✦ ● ● ●', '● ✦ ● ●', '● ● ✦ ●','● ● ● ✦'];
+	var navitexts = ['✦ ● ● ●', '● ✦ ● ●', '● ● ✦ ●', '● ● ● ✦'];
 	var navi = Ti.UI.createLabel({
 		bottom : 0,
 		height : '20dp',
@@ -33,12 +44,11 @@ exports.create = function() {
 		text : '✦ ● ●'
 	});
 	self.add(navi);
-	var PodCast = require('ui/podcast.widget');
-	self.podcastwidget = new PodCast();
 	self.scrollableView.addEventListener('scrollend', function(_e) {
 		listviews[_e.currentPage].update();
 		navi.setText(navitexts[_e.currentPage]);
 	});
-	listviews[0].update();
+	
+	self.add(self.podcastwidget.getView());
 	return self;
 };
