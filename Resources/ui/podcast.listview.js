@@ -19,6 +19,9 @@ exports.create = function(_parent, _podcastlist) {
 		},
 		onload : function(_podcasts) {
 			filesize = _podcasts.filesize;
+			_parent.fireEvent('podcasts_loaded', {
+				filesize : filesize
+			});
 			listView.progressviewwidget.hide();
 			var items = [];
 			for (var i = 0; i < _podcasts.podcasts.length; i++) {
@@ -77,7 +80,7 @@ exports.create = function(_parent, _podcastlist) {
 		var podcast = JSON.parse(e.itemId);
 		//var state = Ti.App.Model.getMy(podcast);
 		var opts = {
-			options : ['Jetzt anhören', 'Vormerken', 'Lokal speichern', 'Kanal abonnieren'],
+			options : ['jetzt anhören', '„nur“ vormerken', 'auch lokal speichern'],
 			selectedIndex : 0,
 			destructive : 2,
 			title : podcast.title
@@ -87,13 +90,32 @@ exports.create = function(_parent, _podcastlist) {
 		dialog.show();
 		dialog.addEventListener('click', function(_evt) {
 			switch (_evt.index) {
+				//  Playing
 				case 0:
-					listView.podcastwidget.togglePlay(podcast);
-					Ti.App.Model.recentMy({
-						podcast : podcast,
-						onload : function() {
-						}
-					});
+					if (Ti.App.Model.getMobileplaywarning()) {
+						var warndialog = Ti.UI.createAlertDialog({
+							cancel : 1,
+							buttonNames : ['Start', 'Abbruch'],
+							message : 'Das Gerät ist im Mobilnetz. Das Abspielen des Podcasts würde Traffic verursachen und damit das Monatkontingent belasten. Dennoch abspielen?',
+							title : 'Warnung vor Trafficverbrauch'
+						});
+						warndialog.show();
+						warndialog.addEventListener('click', function(_e) {
+							listView.podcastwidget.togglePlay(podcast);
+							Ti.App.Model.recentMy({
+								podcast : podcast,
+								onload : function() {
+								}
+							});
+						});
+					} else {
+						listView.podcastwidget.togglePlay(podcast);
+						Ti.App.Model.recentMy({
+							podcast : podcast,
+							onload : function() {
+							}
+						});
+					}
 					break;
 				case 1:
 					Ti.App.Model.favMy({
@@ -105,39 +127,35 @@ exports.create = function(_parent, _podcastlist) {
 					e.section.updateItemAt(e.itemIndex, item);
 
 					break;
+				// Downlaoding
 				case 2:
-					listView.progressviewwidget.setTitle(podcast.title);
-					listView.progressviewwidget.setProgress(0);
-					listView.progressviewwidget.show();
-					listView.progressviewwidget.title.text = podcast.title;
-					Ti.App.Model.saveMy({
-						podcast : podcast,
-						onprogress : function(_p) {
-							listView.progressviewwidget.setProgress(_p);
-							listView.progressviewwidget.setMessage('schon da: ' + parseInt(_p * 100) + '%');
-						},
-						onload : function(_p) {
-							listView.progressviewwidget.hide();
-							item.cached.image = '/images/cached.png';
-							e.section.updateItemAt(e.itemIndex, item);
-						},
-					});
-					listView.progressviewwidget.show();
-					listView.progressviewwidget.setMessage('Starte Herunterladen …');
+					if (Ti.App.Model.getMobiledownload()) {
+						listView.progressviewwidget.setTitle(podcast.title);
+						listView.progressviewwidget.setProgress(0);
+						listView.progressviewwidget.show();
+						listView.progressviewwidget.title.text = podcast.title;
+						Ti.App.Model.saveMy({
+							podcast : podcast,
+							onprogress : function(_p) {
+								listView.progressviewwidget.setProgress(_p);
+								listView.progressviewwidget.setMessage('schon da: ' + parseInt(_p * 100) + '%');
+							},
+							onload : function(_p) {
+								listView.progressviewwidget.hide();
+								item.cached.image = '/images/cached.png';
+								e.section.updateItemAt(e.itemIndex, item);
+							},
+						});
+						listView.progressviewwidget.show();
+						listView.progressviewwidget.setMessage('Starte Herunterladen …');
+					} else {
+						var mobiledialog = Ti.UI.createAlertDialog({
+							message : 'Der Podcast ist nicht runterladbar, weil das Gerät nicht im WLAN ist und Du das in den Einstellungen unterbunden hast',
+							ok : 'OK',
+							title : 'Einwand!'
+						}).show();
+					}
 					break;
-				case 3:
-					Ti.App.Model.saveChannel({
-						filesize : filesize,
-						podcastlist : _podcastlist
-					});
-					Ti.Android && Ti.UI.createNotification({
-						message : 'Kanal vorgemerkt.'
-					}).show();
-					break;
-				default:
-					Ti.UI.createNotification({
-						message : 'Das ist noch nicht realisiert,'
-					}).show();
 
 			}
 		});

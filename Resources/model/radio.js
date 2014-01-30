@@ -27,6 +27,13 @@ var Radio = function() {
 	return this.importList();
 };
 
+Radio.prototype.getMobileplaywarning = function() {
+	return (Ti.Network.getNetworkType() != Ti.Network.NETWORK_MOBILE || !Ti.App.Properties.getProperty('mobilewarning')) ? false : true;
+};
+Radio.prototype.getMobiledownload = function() {
+	return (Ti.Network.getNetworkType() != Ti.Network.NETWORK_MOBILE || !Ti.App.Properties.getProperty('downloadonlywifi')) ? true : false;
+};
+
 Radio.prototype.getQuota = function() {
 	var dir = getFilehandle();
 	var files = dir.getDirectoryListing();
@@ -36,12 +43,11 @@ Radio.prototype.getQuota = function() {
 		for (var i = 0; i < files.length; i++) {
 			filesize += (getFilehandle(files[i]).size) / 1000000;
 		}
-		var res = {
+		return {
 			maxmem : maxmem,
 			filesize : filesize,
 			quota : filesize / maxmem
 		};
-		console.log(res);
 	} else
 		return null;
 };
@@ -171,7 +177,7 @@ Radio.prototype.favMy = function(_args) {
 
 Radio.prototype.saveChannel = function(_podcasts) {
 	console.log(_podcasts);
-	var id = Ti.Utils.md5HexDigest(_podcasts.podcastlist.feed);
+	var id = Ti.Utils.md5HexDigest(_podcasts.feed);
 	var db = Ti.Database.open(RADIOLIST);
 	var res = db.execute('SELECT count(*) as total FROM channels WHERE id=?', id);
 	var now = (new Date).getTime();
@@ -181,8 +187,21 @@ Radio.prototype.saveChannel = function(_podcasts) {
 	}
 	//(id , title , station , logo , url , lastentry , filesize )
 	if (!total)
-		db.execute('INSERT INTO channels VALUES (?,?,?,?,?,?,?,?,0)', id, _podcasts.podcastlist.title, _podcasts.podcastlist.station, _podcasts.podcastlist.logo, _podcasts.podcastlist.feed, '', _podcasts.filesize, (new Date()).getTime());
+		db.execute('INSERT INTO channels VALUES (?,?,?,?,?,?,?,?,0)', id, _podcasts.title, _podcasts.station, _podcasts.logo, _podcasts.feed, '', _podcasts.filesize, (new Date()).getTime());
 	db.close();
+};
+Radio.prototype.isChannelsaved = function(_podcasts) {
+	var db = Ti.Database.open(RADIOLIST);
+	var id = Ti.Utils.md5HexDigest(_podcasts.feed);
+	var total = 0;
+	var res = db.execute('SELECT count(*) as total FROM channels WHERE id=?', id);
+	if (res.isValidRow()) {
+		total = res.fieldByName('total');
+		console.log('Info: ' + total + ' gefunden ('+id+')');
+		res.close();
+	}
+	db.close();
+	return (total) ? true : false;
 };
 
 Radio.prototype.getChannels = function() {

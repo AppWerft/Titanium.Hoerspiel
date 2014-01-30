@@ -50,8 +50,6 @@ exports.create = function(_args) {
 			headerView : headerView,
 			items : items
 		})];
-		var quota = (Ti.App.Model.getQuota()) ? Ti.App.Model.getQuota().quota : 0;
-		quotaView.setValue(quota);
 		self.setSections(sections);
 	}
 
@@ -60,26 +58,32 @@ exports.create = function(_args) {
 			'template' : require('ui/templates').podcastTemplate
 		},
 		defaultItemTemplate : 'template',
+		borderWidth : 0.5,
+		borderColor : 'silver',
 		backgroundColor : 'white'
 	});
 	var headerView = Ti.UI.createView({
 		height : '30dp',
 		backgroundColor : 'gray'
 	});
-
-	var quotaView = Ti.UI.createProgressBar({
-		min : 0,
-		max : 1,
-		value : 0,
-		bottom : '5dp',
-		height : Ti.UI.FILL,
-		width : Ti.UI.FILL,
-		left : '200dp',
-		right : '10dp'
-	});
-	//if (_args.type == 'cached') {
+	if (_args.type.key == 'cached') {
+		var quota = (Ti.App.Model.getQuota()) ? Ti.App.Model.getQuota().quota : 0.02;
+		var quotaView = Ti.UI.createProgressBar({
+			min : 0,
+			max : 1,
+			value : quota,
+			bottom : '5dp',
+			height : '30dp',
+			width : Ti.UI.FILL,
+			left : '200dp',
+			right : '10dp'
+		});
+		console.log(_args);
+		//if (_args.type == 'cached') {
 		headerView.add(quotaView);
 		quotaView.show();
+	}
+	
 	//}
 	headerView.add(Ti.UI.createLabel({
 		left : '40dp',

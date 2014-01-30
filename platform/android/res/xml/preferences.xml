@@ -2,13 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="Einstellungen für Hörspiel2Go">
  
-  <PreferenceCategory android:title="Anonymität">
-    <SwitchPreference
-      android:title="Eigenen Standort"
-      android:defaultValue="false"
-      android:summary="Wenn der eigene Standort freigegeben ist, wird auf einer Karte angezeigt, welcher Sender wo gerade gehört wird"
-      android:key="checkbox" />
-  </PreferenceCategory>
+  
   
   <PreferenceCategory android:title="Speicherverbrauch">
     <ListPreference
@@ -24,12 +18,19 @@
     <SwitchPreference
       android:title="Mobile Warnung"
       android:defaultValue="false"
-      android:summary="Wenn freiimfelde kein WLAN ist, dann gibt es vor dem Abspielen eine Nachfrage."
+      android:summary="Wenn draußen kein WLAN ist, dann gibt es vor dem Abspielen eine Nachfrage."
       android:key="mobilewarning" />
     <CheckBoxPreference
       android:title="Download nur im WLAN"
       android:defaultValue="false"
       android:summary="Du kannst Hörstücke mitnehmen. Das Abspeichern passiert normalerweise im WLAN. Das kannst Du darauf beschränken"
       android:key="downloadonlywifi" />
+  </PreferenceCategory>
+  <PreferenceCategory android:title="Anonymität">
+    <SwitchPreference
+      android:title="Eigenen Standort"
+      android:defaultValue="false"
+      android:summary="Wenn der eigene Standort freigegeben ist, wird auf einer Karte angezeigt, welcher Sender wo gerade gehört wird. (das ist noch Zukunftsmusik … will das jemand?)"
+      android:key="publiclocation" />
   </PreferenceCategory>
 </PreferenceScreen>

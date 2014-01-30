@@ -37,7 +37,7 @@ exports.create = function() {
                 width : '100%',
                 min : 0,
                 max : 1,
-                height : '25dp',
+                height : '35dp',
                 top : 0
         });
         self.container.add(self.progress);
