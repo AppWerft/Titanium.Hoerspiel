@@ -3,9 +3,10 @@
  */
 exports.create = function(_args) {
 	function updateList() {
-		switch (_args.type) {
+		switch (_args.type.key) {
 			case 'channels':
 				var podcasts = Ti.App.Model.getChannels();
+				console.log(podcasts);
 				break;
 			default:
 				var podcasts = Ti.App.Model.getMy()[_args.type.key];
@@ -78,13 +79,16 @@ exports.create = function(_args) {
 			left : '200dp',
 			right : '10dp'
 		});
+		Ti.App.addEventListener('quota', function(_evt) {
+			console.log(_evt);
+			quotaView.setValue(_evt.quota.quota);
+		});
 		console.log(_args);
 		//if (_args.type == 'cached') {
 		headerView.add(quotaView);
 		quotaView.show();
 	}
-	
-	//}
+
 	headerView.add(Ti.UI.createLabel({
 		left : '40dp',
 		textAlign : 'left',

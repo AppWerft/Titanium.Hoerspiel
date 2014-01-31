@@ -45,7 +45,7 @@
         <uses-sdk>14</uses-sdk>
         <manifest android:versionCode="40" android:versionName="1.40">
             <uses-permission android:name="android.permission.INTERNET"/>
-            <application android:largeHeap="true">
+            <application android:debuggable="true">
                 <activity android:configChanges="keyboardHidden"
                     android:name="org.appcelerator.titanium.TiActivity" android:screenOrientation="portrait"/>
                 <!--

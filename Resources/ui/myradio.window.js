@@ -2,6 +2,7 @@ exports.create = function() {
 	function togglePlay(_podcast) {
 		self.podcastwidget.togglePlay(_podcast);
 	}
+
 	var self = Ti.UI.createWindow({
 		backgroundImage : 'default.png'
 	});
@@ -45,10 +46,14 @@ exports.create = function() {
 	});
 	self.add(navi);
 	self.scrollableView.addEventListener('scrollend', function(_e) {
+		console.log('Info: srollend received ndx=' + _e.currentPage);
 		listviews[_e.currentPage].update();
 		navi.setText(navitexts[_e.currentPage]);
 	});
-	
+	self.addEventListener('focus', function() {
+		console.log('Info: focus of depot received ndx=' + self.scrollableView.currentPage);
+		listviews[self.scrollableView.currentPage].update();
+	});
 	self.add(self.podcastwidget.getView());
 	return self;
 };

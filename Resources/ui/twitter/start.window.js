@@ -11,6 +11,7 @@ exports.create = function() {
 	
 	function updateTweetsOnGUI() {
 		Ti.App.Twitter.fetch('search_tweets', 'Hörspiel', function(_response) {
+			if (!_response || !_response.statuses) return;
 			var data = [];
 			for (var i = 0; i < _response.statuses.length; i++) {
 				data.push(require('ui/twitter/tweet').create(_response.statuses[i]));

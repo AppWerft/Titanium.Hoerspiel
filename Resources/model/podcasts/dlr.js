@@ -32,6 +32,8 @@ exports.get = function(_callback) {
 		});
 		xhr.open('GET', 'http://www.deutschlandradio.de/podcasts.226.de.html', true);
 		xhr.send();
+		Ti.App.addEventListener('app:exit', xhr.abort);
+
 	}
 };
 

@@ -33,7 +33,9 @@ Radio.prototype.getMobileplaywarning = function() {
 Radio.prototype.getMobiledownload = function() {
 	return (Ti.Network.getNetworkType() != Ti.Network.NETWORK_MOBILE || !Ti.App.Properties.getProperty('downloadonlywifi')) ? true : false;
 };
-
+Ti.App.Properties.addEventListener('change', function(_evt) {
+	console.log(_evt);
+});
 Radio.prototype.getQuota = function() {
 	var dir = getFilehandle();
 	var files = dir.getDirectoryListing();
@@ -43,11 +45,15 @@ Radio.prototype.getQuota = function() {
 		for (var i = 0; i < files.length; i++) {
 			filesize += (getFilehandle(files[i]).size) / 1000000;
 		}
-		return {
+		var quota = {
 			maxmem : maxmem,
 			filesize : filesize,
 			quota : filesize / maxmem
 		};
+		Ti.App.fireEvent("quota", {
+			"quota" : quota
+		});
+		return quota;
 	} else
 		return null;
 };
@@ -73,14 +79,14 @@ Radio.prototype.resolvePlaylist = function(_args) {
 	});
 	xhr.open('GET', _args.playlist);
 	xhr.send();
-};
-Radio.prototype.getChannels = function() {
-	return [];
+	Ti.App.addEventListener('app:exit', xhr.abort);
+
 };
 
 Radio.prototype.getAllFiles = function() {
 
 };
+
 Radio.prototype.getMy = function() {
 	var link = Ti.Database.open(RADIOLIST);
 	var list = {
@@ -129,6 +135,7 @@ Radio.prototype.getMy = function() {
 
 Radio.prototype.saveMy = function(_args) {
 	var id = Ti.Utils.md5HexDigest(_args.podcast.media);
+	var self = this;
 	var xhr = Ti.Network.createHTTPClient({
 		onload : function() {
 			var db = Ti.Database.open(RADIOLIST);
@@ -144,6 +151,7 @@ Radio.prototype.saveMy = function(_args) {
 				db.execute('UPDATE myfavsandsaves SET localcached=1 WHERE id=?', id);
 			} else
 				db.execute('INSERT INTO myfavsandsaves VALUES (?,?,?,?,?,?,?)', id, JSON.stringify(_args.podcast), now, now, 0, 0, 1);
+			self.getQuota();
 			_args.onload && (_args.onload(true));
 			db.close();
 		},
@@ -154,6 +162,8 @@ Radio.prototype.saveMy = function(_args) {
 	});
 	xhr.open('GET', _args.podcast.media);
 	xhr.send();
+	Ti.App.addEventListener('app:exit', xhr.abort);
+
 };
 
 Radio.prototype.favMy = function(_args) {
@@ -197,7 +207,7 @@ Radio.prototype.isChannelsaved = function(_podcasts) {
 	var res = db.execute('SELECT count(*) as total FROM channels WHERE id=?', id);
 	if (res.isValidRow()) {
 		total = res.fieldByName('total');
-		console.log('Info: ' + total + ' gefunden ('+id+')');
+		console.log('Info: ' + total + ' gefunden (' + id + ')');
 		res.close();
 	}
 	db.close();
@@ -206,14 +216,20 @@ Radio.prototype.isChannelsaved = function(_podcasts) {
 
 Radio.prototype.getChannels = function() {
 	var db = Ti.Database.open(RADIOLIST);
-	var res = db.execute('SELECT * FROM channels WHERE id=?', id);
-	var now = (new Date).getTime();
-	if (res.isValidRow()) {
-		var total = res.fieldByName('total');
-		console.log('Info: ' + total + ' gefunden');
+	var res = db.execute('SELECT *,url as media FROM channels');
+	var channels = [];
+	var fields = ['id', 'title', 'station', 'logo', 'url', 'lastentry', 'filesize', 'ctime', 'done'];
+	while (res.isValidRow()) {
+		var channel = {};
+		for (var i = 0; i < fields.length; i++) {
+			channel[fields[i]] = res.fieldByName(fields[i]);
+		}
+		channels.push(channel);
+		res.next();
 	}
-	//(id , title , station , logo , url , lastentry , filesize )
+	res.close();
 	db.close();
+	return channels;
 };
 
 Radio.prototype.recentMy = function(_args) {
@@ -391,6 +407,7 @@ Radio.prototype.getPodcast = function(_args) {
 		xhr.open('GET', _args.podcastlist.feed, true);
 		console.log(_args.podcastlist.feed);
 		xhr.send();
+		Ti.App.addEventListener('app:exit', xhr.abort);
 	} else
 		link.close();
 };

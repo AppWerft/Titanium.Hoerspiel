@@ -31,32 +31,11 @@ exports.get = function(_callback) {
 
 			}
 		});
+//		Ti.App.addEventListener('app:exit', function(){Ti.Yahoo.abort()});
+
 	}
 
-	var x = '';
+	
 
-	var example = {
-		"class" : "shows",
-		"div" : {
-			"h3" : {
-				"a" : {
-					"content" : "1 gegen 100"
-				}
-			},
-			"p" : "Gameshow, in der ein Kandidat gegen 100 Kontrahenten antritt.",
-			"div" : {
-				"ul" : {
-					"li" : [{
-						"div" : [{
-						}, {
-							"input" : {
-								"value" : "http://www.srf.ch/podcasts/feeds/video/1gegen100-hd.xml"
-							}
-						}]
-					}, {
-					}]
-				}
-			}
-		}
-	};
+	
 };

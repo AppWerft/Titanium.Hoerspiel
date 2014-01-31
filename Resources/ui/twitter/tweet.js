@@ -5,6 +5,7 @@ exports.create = function(tweet) {
 		hasDetails : true,
 		height : Ti.UI.SIZE
 	});
+	if (!tweet) return row;
 	row.add(Ti.UI.createLabel({
 		text : tweet.user.name + ', ' + tweet.user.location,
 		top : '5dp',

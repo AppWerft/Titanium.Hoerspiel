@@ -3,9 +3,22 @@ exports.create = function() {// this sets the background color of the master UIV
 		fullscreen : true,
 		exitOnClose : true
 	});
+	self.addEventListener("close", function(e) {
+
+	});
 	self.addEventListener("open", function(e) {
 		if (Ti.Android) {
 			self.activity = self.getActivity();
+			self.activity.addEventListener('androidback', function() {
+				Ti.App.fireEvent('app:exit');
+				console.log('Info: tabgroup closed =======================');
+				setTimeout(function(){
+				console.log('Info: activity of tabgroup finished =======================');
+			
+					self.activity.finish();
+				},3000);
+			});
+
 			self.actionBar = self.activity.actionBar;
 			self.activity.onCreateOptionsMenu = function(e) {
 				e.menu.clear();
