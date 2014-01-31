@@ -184,14 +184,14 @@ exports.podcastsTemplate = {
 	}]
 };
 
-exports.channelTemplate = {
+exports.podcastTemplate = {
 	properties : {
 		height : Ti.UI.SIZE,
 		backgroundColor : 'white'
 	},
 	childTemplates : [{
 		type : 'Ti.UI.ImageView',
-		bindId : 'logo',
+		bindId : 'pict',
 		properties : {
 			width : '70dip',
 			height : '70dip',
@@ -200,12 +200,22 @@ exports.channelTemplate = {
 		}
 	}, {
 		type : 'Ti.UI.ImageView',
-		bindId : 'station',
+		bindId : 'cached',
 		properties : {
-			width : '70dip',
-			height : '70dip',
+			width : '20dip',
+			height : '20dip',
 			bottom : '5dp',
 			left : '30dp',
+			image : '/images/nil.png'
+		}
+	}, {
+		type : 'Ti.UI.ImageView',
+		bindId : 'faved',
+		properties : {
+			width : '20dip',
+			height : '20dip',
+			bottom : '5dp',
+			left : '2dp',
 			image : '/images/nil.png'
 		}
 	}, {
@@ -247,6 +257,89 @@ exports.channelTemplate = {
 			}
 		}, {
 			type : 'Ti.UI.Label',
+			bindId : 'author',
+			properties : {
+				color : '#333',
+				top : 0,
+				height : Ti.UI.SIZE,
+				font : {
+					fontFamily : fontFamily,
+					fontSize : '14dp',
+				},
+				left : '80dip',
+				right : '30dp',
+				height : Ti.UI.SIZE
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'pubdate',
+			properties : {
+				color : '#333',
+				top : '2dp',
+				font : {
+					fontFamily :fontFamily,
+					fontSize : '10dp',
+				},
+				left : '80dip',
+				height : Ti.UI.SIZE,
+				right : '30dp',
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'duration',
+			properties : {
+				color : '#333',
+				top : '0dp',
+				font : {
+					fontFamily : fontFamily ,
+					fontSize : '12dp',
+				},
+				left : '80dip',
+				height : Ti.UI.SIZE,
+				right : '30dp',
+				bottom : '5dp'
+			}
+		}]
+	}]
+};
+exports.channelsTemplate = {
+	properties : {
+		height : Ti.UI.SIZE,
+		backgroundColor : 'white'
+	},
+	childTemplates : [{
+		type : 'Ti.UI.ImageView',
+		bindId : 'logo',
+		properties : {
+			width : '70dip',
+			height : '70dip',
+			top : '0dp',
+			left : 0
+		}
+	}, {
+		type : 'Ti.UI.View',
+		properties : {
+			layout : 'vertical',
+			top : 0,
+			left : 0
+		},
+		childTemplates : [{
+			type : 'Ti.UI.Label',
+			bindId : 'title',
+			properties : {
+				color : '#666',
+				top : '5dp',
+				font : {
+					fontFamily : fontFamily,
+					fontSize : '18dp',
+					fontWeight : 'bold'
+				},
+				left : '80dip',
+				right : '30dp',
+				height : Ti.UI.SIZE
+			}
+		}, {
+			type : 'Ti.UI.Label',
 			bindId : 'pubdate',
 			properties : {
 				color : '#333',
@@ -262,3 +355,4 @@ exports.channelTemplate = {
 		}]
 	}]
 };
+		

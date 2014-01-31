@@ -218,12 +218,15 @@ Radio.prototype.getChannels = function() {
 	var db = Ti.Database.open(RADIOLIST);
 	var res = db.execute('SELECT *,url as media FROM channels');
 	var channels = [];
-	var fields = ['id', 'title', 'station', 'logo', 'url', 'lastentry', 'filesize', 'ctime', 'done'];
+	var fields = ['id', 'total', 'podcast', 'title', 'station', 'logo', 'url', 'lastentry', 'filesize', 'ctime', 'done'];
 	while (res.isValidRow()) {
 		var channel = {};
 		for (var i = 0; i < fields.length; i++) {
 			channel[fields[i]] = res.fieldByName(fields[i]);
 		}
+		channel.feed = channel.url;
+		if (!channel.logo)
+			channel.logo = '/images/' + channel.station + '.png';
 		channels.push(channel);
 		res.next();
 	}
@@ -260,6 +263,15 @@ Radio.prototype.importList = function() {
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
 		link.execute('CREATE TABLE IF NOT EXISTS channels (id TEXT, title TEXT, station TEXT, logo TEXT, url TEXT, lastentry NUMERIC, filesize NUMERIC, ctime NUMERIC, done NUMERIC)');
+		var res = link.execute('SELECT count(*) total FROM sqlite_master WHERE type="table"');
+		if (res.isValidRow()) {
+			var total = res.fieldByName('total');
+			res.close();
+		}
+		if (total == 9) {
+			link.execute('ALTER TABLE channels ADD COLUMN total NUMERIC');
+			link.execute('ALTER TABLE channels ADD COLUMN podcast TEXT');
+		}
 		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
 		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT, livestreamurl TEXT)');
 		console.log('Info:db installed/opened, now import begins');

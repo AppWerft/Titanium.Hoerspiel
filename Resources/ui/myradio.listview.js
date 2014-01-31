@@ -1,132 +1,97 @@
-/*  .type: which panel as  string
+/*  .key: which panel as  string
  *  .onclick: _callback on itemclick, controlsplayer in parent
  */
-exports.create = function(_args) {
+exports.create = function() {
+	var options = arguments[0] || {}, items = [];
+	var section = Ti.UI.createListSection({
+		headerView : require('ui/headerview.widget').create(options),
+	});
 	function updateList() {
-		switch (_args.type.key) {
+		console.log('Info: start updateList with: ' + options.key);
+		switch (options.key) {
 			case 'channels':
 				var podcasts = Ti.App.Model.getChannels();
-				console.log(podcasts);
 				break;
 			default:
-				var podcasts = Ti.App.Model.getMy()[_args.type.key];
+				var podcasts = Ti.App.Model.getMy()[options.key];
 				break;
 		}
-		var items = [];
+		items = [];
 		for (var i = 0; i < podcasts.length; i++) {
 			var podcast = podcasts[i];
-			if (_args.type.key == 'channels')
-				/*items.push({
-				 properties : {
-				 itemId : JSON.stringify(podcast),
-				 accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-				 },
-				 title : {
-				 text : podcast.title
-				 },
-				 pubdate : {
-				 text :  podcast.pubdate
-				 },
-				 logo : {
-				 image : podcast.logo
-				 },
-				 station : {
-				 image : '/images/'+podcast.station+'.png'
-				 }
-				 });*/
-				;
-			else
-				items.push({
-					properties : {
-						itemId : JSON.stringify(podcast),
-						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-					},
-					title : {
-						text : podcast.title
-					},
-					author : {
-						text : podcast.author
-					},
-					duration : {
-						text : 'Dauer: ' + podcast.duration
-					},
-					pubdate : {
-						text : 'Sendezeit: ' + podcast.pubdate
-					},
-					pict : {
-						image : podcast.pict
-					},
-					cached : {
-						image : '/images/nil.png'
-					},
-					faved : {
-						image : '/images/nil.png'
-					},
-					summary : {
-						height : 0
-					}
-				});
+			switch (options.key) {
+				case 'channels':
+					items.push({
+						properties : {
+							itemId : JSON.stringify(podcast),
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_NONE
+						},
+						title : {
+							text : podcast.title
+						},
+						logo : {
+							image : podcast.logo
+						}
+					});
+					break;
+				default:
+					items.push({
+						properties : {
+							itemId : JSON.stringify(podcast),
+							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+						},
+						title : {
+							text : podcast.title
+						},
+						author : {
+							text : podcast.author
+						},
+						duration : {
+							text : 'Dauer: ' + podcast.duration
+						},
+						pubdate : {
+							text : 'Sendezeit: ' + podcast.pubdate
+						},
+						pict : {
+							image : podcast.pict
+						},
+						cached : {
+							image : '/images/nil.png'
+						},
+						faved : {
+							image : '/images/nil.png'
+						},
+						summary : {
+							height : 0
+						}
+					});
+			}
 		}
-
-		var sections = [Ti.UI.createListSection({
-			headerView : headerView,
-			items : items
-		})];
-		self.setSections(sections);
-	}
+		section.setItems(items);
+	}// ends of updateList
 
 	var self = Ti.UI.createListView({
 		templates : {
-			'template' : (_args.type.key == 'channels') ? require('ui/templates').podcastTemplate : require('ui/templates').channelTemplate
+			'template' : (options.key == 'channels') ? require('ui/templates').channelsTemplate : require('ui/templates').podcastTemplate
 		},
 		defaultItemTemplate : 'template',
-		borderWidth : 0.5,
-		borderColor : 'silver',
-		backgroundColor : 'white'
+		borderWidth : 0.4,
+		borderColor : '#66f',
+		backgroundColor : 'white',
+		sections : [section]
 	});
-	var headerView = Ti.UI.createView({
-		height : '30dp',
-		backgroundColor : 'gray'
-	});
-	if (_args.type.key == 'cached') {
-		var quota = (Ti.App.Model.getQuota()) ? Ti.App.Model.getQuota().quota : 0.02;
-		var quotaView = Ti.UI.createProgressBar({
-			min : 0,
-			max : 1,
-			value : quota,
-			bottom : '5dp',
-			height : '30dp',
-			width : Ti.UI.FILL,
-			left : '200dp',
-			right : '10dp'
-		});
-		Ti.App.addEventListener('quota', function(_evt) {
-			console.log(_evt);
-			quotaView.setValue(_evt.quota.quota);
-		});
-		console.log(_args);
-		//if (_args.type == 'cached') {
-		headerView.add(quotaView);
-		quotaView.show();
-	}
 
-	headerView.add(Ti.UI.createLabel({
-		left : '40dp',
-		textAlign : 'left',
-		color : 'white',
-		font : {
-			fontWeight : 'bold'
-		},
-		text : _args.type.title
-	}));
-	headerView.add(Ti.UI.createImageView({
-		left : '5dp',
-		width : '25dp',
-		height : '25dp',
-		image : '/images/' + _args.type.key + '.png'
-	}));
 	self.addEventListener('itemclick', function(_evt) {
-		_args.onclick && _args.onclick(JSON.parse(_evt.itemId));
+		var podcast  = JSON.parse(_evt.itemId);
+		if (options.key != 'channels')
+			options.onclick && options.onclick(podcast);
+		else {
+			var win = require('ui/podcast.window').create(podcast);
+		if (Ti.Android)
+			win.open();
+		else
+			self.tab.open(win);
+		}
 	});
 	self.update = updateList;
 	return self;

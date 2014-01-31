@@ -6,7 +6,9 @@ exports.create = function() {
 	var self = Ti.UI.createWindow({
 		backgroundImage : 'default.png'
 	});
+
 	self.podcastwidget = new (require('ui/radio.widget'))();
+
 	var types = [{
 		key : 'cached',
 		title : 'Offline - Podcast'
@@ -20,23 +22,23 @@ exports.create = function() {
 		key : 'channels',
 		title : 'Vorgemerkte Kanäle'
 	}];
-	var listviews = [];
+	var depotlistviews = [];
 	for (var i = 0; i < types.length; i++) {
-
-		listviews.push(require('ui/myradio.listview').create({
-			type : types[i],
+		depotlistviews.push(require('ui/myradio.listview').create({
+			key : types[i].key,
+			title : types[i].title,
 			onclick : togglePlay
 		}));
-		listviews[i].update();
 	}
 
 	self.scrollableView = Ti.UI.createScrollableView({
 		bottom : '20dp',
-		views : listviews,
+		views : depotlistviews,
 		showPagingControl : true,
 		backgroundColor : 'white'
 	});
 	self.add(self.scrollableView);
+
 	var navitexts = ['✦ ● ● ●', '● ✦ ● ●', '● ● ✦ ●', '● ● ● ✦'];
 	var navi = Ti.UI.createLabel({
 		bottom : 0,
@@ -46,14 +48,17 @@ exports.create = function() {
 	});
 	self.add(navi);
 	self.scrollableView.addEventListener('scrollend', function(_e) {
-		console.log('Info: srollend received ndx=' + _e.currentPage);
-		listviews[_e.currentPage].update();
+		console.log('Info: scrollend received ndx=' + _e.currentPage);
+		depotlistviews[_e.currentPage].update();
 		navi.setText(navitexts[_e.currentPage]);
 	});
 	self.addEventListener('focus', function() {
 		console.log('Info: focus of depot received ndx=' + self.scrollableView.currentPage);
-		listviews[self.scrollableView.currentPage].update();
+		console.log(depotlistviews[i]);
+		depotlistviews[self.scrollableView.currentPage].update && depotlistviews[self.scrollableView.currentPage].update();
 	});
 	self.add(self.podcastwidget.getView());
+
 	return self;
+
 };

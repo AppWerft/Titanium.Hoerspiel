@@ -33,17 +33,17 @@
                 <key>UIRequiresPersistentWiFi</key>
                 <false/>
                 <key>UIPrerenderedIcon</key>
-                <false/>  
+                <false/>
                 <key>UIStatusBarHidden</key>
                 <false/>
                 <key>UIStatusBarStyle</key>
                 <string>UIStatusBarStyleDefault</string>
             </dict>
-        </plist>  
+        </plist>
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="40" android:versionName="1.40">
+        <manifest android:versionCode="41" android:versionName="1.41">
             <uses-permission android:name="android.permission.INTERNET"/>
             <application android:debuggable="true">
                 <activity android:configChanges="keyboardHidden"
@@ -70,7 +70,7 @@
         <target device="mobileweb">false</target>
         <target device="tizen">false</target>
     </deployment-targets>
-    <sdk-version>3.2.0.evalJSpatch</sdk-version>
+    <sdk-version>3.2.0.GA</sdk-version>
     <property name="twitter.consumerkey">oPZ0BvXVMgADagcWPYzsg</property>
     <property name="twitter.consumersecret">uBPjIxmoT0pYw8WBnYb1r3jLjn4CiKoMs0T3feAgvs</property>
 </ti:app>
