@@ -184,14 +184,14 @@ exports.podcastsTemplate = {
 	}]
 };
 
-exports.podcastTemplate = {
+exports.channelTemplate = {
 	properties : {
 		height : Ti.UI.SIZE,
 		backgroundColor : 'white'
 	},
 	childTemplates : [{
 		type : 'Ti.UI.ImageView',
-		bindId : 'pict',
+		bindId : 'logo',
 		properties : {
 			width : '70dip',
 			height : '70dip',
@@ -200,22 +200,12 @@ exports.podcastTemplate = {
 		}
 	}, {
 		type : 'Ti.UI.ImageView',
-		bindId : 'cached',
+		bindId : 'station',
 		properties : {
-			width : '20dip',
-			height : '20dip',
+			width : '70dip',
+			height : '70dip',
 			bottom : '5dp',
 			left : '30dp',
-			image : '/images/nil.png'
-		}
-	}, {
-		type : 'Ti.UI.ImageView',
-		bindId : 'faved',
-		properties : {
-			width : '20dip',
-			height : '20dip',
-			bottom : '5dp',
-			left : '2dp',
 			image : '/images/nil.png'
 		}
 	}, {
@@ -257,21 +247,6 @@ exports.podcastTemplate = {
 			}
 		}, {
 			type : 'Ti.UI.Label',
-			bindId : 'author',
-			properties : {
-				color : '#333',
-				top : 0,
-				height : Ti.UI.SIZE,
-				font : {
-					fontFamily : fontFamily,
-					fontSize : '14dp',
-				},
-				left : '80dip',
-				right : '30dp',
-				height : Ti.UI.SIZE
-			}
-		}, {
-			type : 'Ti.UI.Label',
 			bindId : 'pubdate',
 			properties : {
 				color : '#333',
@@ -283,21 +258,6 @@ exports.podcastTemplate = {
 				left : '80dip',
 				height : Ti.UI.SIZE,
 				right : '30dp',
-			}
-		}, {
-			type : 'Ti.UI.Label',
-			bindId : 'duration',
-			properties : {
-				color : '#333',
-				top : '0dp',
-				font : {
-					fontFamily : fontFamily ,
-					fontSize : '12dp',
-				},
-				left : '80dip',
-				height : Ti.UI.SIZE,
-				right : '30dp',
-				bottom : '5dp'
 			}
 		}]
 	}]

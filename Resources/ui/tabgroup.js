@@ -12,11 +12,10 @@ exports.create = function() {// this sets the background color of the master UIV
 			self.activity.addEventListener('androidback', function() {
 				Ti.App.fireEvent('app:exit');
 				console.log('Info: tabgroup closed =======================');
-				setTimeout(function(){
-				console.log('Info: activity of tabgroup finished =======================');
-			
-					self.activity.finish();
-				},3000);
+				setTimeout(function() {
+			console.log('Info: activity of tabgroup finished =======================');					
+				self.activity.finish();
+				}, 3000);
 			});
 
 			self.actionBar = self.activity.actionBar;

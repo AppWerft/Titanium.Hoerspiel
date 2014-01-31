@@ -15,36 +15,57 @@ exports.create = function(_args) {
 		var items = [];
 		for (var i = 0; i < podcasts.length; i++) {
 			var podcast = podcasts[i];
-			items.push({
-				properties : {
-					itemId : JSON.stringify(podcast),
-					accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
-				},
-				title : {
-					text : podcast.title
-				},
-				author : {
-					text : podcast.author
-				},
-				duration : {
-					text : 'Dauer: ' + podcast.duration
-				},
-				pubdate : {
-					text : 'Sendezeit: ' + podcast.pubdate
-				},
-				pict : {
-					image : podcast.pict
-				},
-				cached : {
-					image : '/images/nil.png'
-				},
-				faved : {
-					image : '/images/nil.png'
-				},
-				summary : {
-					height : 0
-				}
-			});
+			if (_args.type.key == 'channels')
+				/*items.push({
+				 properties : {
+				 itemId : JSON.stringify(podcast),
+				 accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+				 },
+				 title : {
+				 text : podcast.title
+				 },
+				 pubdate : {
+				 text :  podcast.pubdate
+				 },
+				 logo : {
+				 image : podcast.logo
+				 },
+				 station : {
+				 image : '/images/'+podcast.station+'.png'
+				 }
+				 });*/
+				;
+			else
+				items.push({
+					properties : {
+						itemId : JSON.stringify(podcast),
+						accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_DETAIL
+					},
+					title : {
+						text : podcast.title
+					},
+					author : {
+						text : podcast.author
+					},
+					duration : {
+						text : 'Dauer: ' + podcast.duration
+					},
+					pubdate : {
+						text : 'Sendezeit: ' + podcast.pubdate
+					},
+					pict : {
+						image : podcast.pict
+					},
+					cached : {
+						image : '/images/nil.png'
+					},
+					faved : {
+						image : '/images/nil.png'
+					},
+					summary : {
+						height : 0
+					}
+				});
 		}
 
 		var sections = [Ti.UI.createListSection({
@@ -56,7 +77,7 @@ exports.create = function(_args) {
 
 	var self = Ti.UI.createListView({
 		templates : {
-			'template' : require('ui/templates').podcastTemplate
+			'template' : (_args.type.key == 'channels') ? require('ui/templates').podcastTemplate : require('ui/templates').channelTemplate
 		},
 		defaultItemTemplate : 'template',
 		borderWidth : 0.5,
