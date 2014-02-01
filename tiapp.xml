@@ -43,9 +43,9 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="41" android:versionName="1.41">
+        <manifest android:versionCode="42" android:versionName="1.42">
             <uses-permission android:name="android.permission.INTERNET"/>
-            <application android:debuggable="true">
+            <application android:debuggable="false">
                 <activity android:configChanges="keyboardHidden"
                     android:name="org.appcelerator.titanium.TiActivity" android:screenOrientation="portrait"/>
                 <!--

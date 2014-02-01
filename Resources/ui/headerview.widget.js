@@ -33,8 +33,8 @@ exports.create = function(_options){
 	}));
 	self.add(Ti.UI.createImageView({
 		left : '5dp',
-		width : '25dp',
-		height : '25dp',
+		width : '32dp',
+		height : '32dp',
 		image : '/images/' + _options.key + '.png'
 	}));
 	return self;

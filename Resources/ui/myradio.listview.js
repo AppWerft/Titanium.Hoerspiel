@@ -17,22 +17,13 @@ exports.create = function() {
 				break;
 		}
 		items = [];
+		var Item = require('ui/channelitem.widget');
 		for (var i = 0; i < podcasts.length; i++) {
 			var podcast = podcasts[i];
 			switch (options.key) {
 				case 'channels':
-					items.push({
-						properties : {
-							itemId : JSON.stringify(podcast),
-							accessoryType : Ti.UI.LIST_ACCESSORY_TYPE_NONE
-						},
-						title : {
-							text : podcast.title
-						},
-						logo : {
-							image : podcast.logo
-						}
-					});
+					var item = new Item(podcast,section);
+					items.push(item);
 					break;
 				default:
 					items.push({
@@ -82,15 +73,15 @@ exports.create = function() {
 	});
 
 	self.addEventListener('itemclick', function(_evt) {
-		var podcast  = JSON.parse(_evt.itemId);
+		var podcast = JSON.parse(_evt.itemId);
 		if (options.key != 'channels')
 			options.onclick && options.onclick(podcast);
 		else {
 			var win = require('ui/podcast.window').create(podcast);
-		if (Ti.Android)
-			win.open();
-		else
-			self.tab.open(win);
+			if (Ti.Android)
+				win.open();
+			else
+				self.tab.open(win);
 		}
 	});
 	self.update = updateList;

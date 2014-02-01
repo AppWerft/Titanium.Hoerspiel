@@ -1,4 +1,4 @@
-var fontFamily =  (Ti.Android) ? 'Droid Sans' : 'Helvetica Neue';
+var fontFamily = (Ti.Android) ? 'Droid Sans' : 'Helvetica Neue';
 exports.timelineactiveTemplate = {
 	properties : {
 		height : '100dip',
@@ -132,7 +132,7 @@ exports.listTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : fontFamily ,
+				fontFamily : fontFamily,
 				fontSize : '18dp',
 			},
 			left : '70dip',
@@ -150,7 +150,7 @@ exports.podcastsTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : fontFamily ,
+				fontFamily : fontFamily,
 				fontSize : '18dp',
 				fontWeight : 'bold'
 			},
@@ -171,7 +171,7 @@ exports.podcastsTemplate = {
 		properties : {
 			color : '#333',
 			font : {
-				fontFamily : fontFamily ,
+				fontFamily : fontFamily,
 				fontSize : '14dp',
 
 			},
@@ -277,7 +277,7 @@ exports.podcastTemplate = {
 				color : '#333',
 				top : '2dp',
 				font : {
-					fontFamily :fontFamily,
+					fontFamily : fontFamily,
 					fontSize : '10dp',
 				},
 				left : '80dip',
@@ -291,7 +291,7 @@ exports.podcastTemplate = {
 				color : '#333',
 				top : '0dp',
 				font : {
-					fontFamily : fontFamily ,
+					fontFamily : fontFamily,
 					fontSize : '12dp',
 				},
 				left : '80dip',
@@ -317,6 +317,15 @@ exports.channelsTemplate = {
 			left : 0
 		}
 	}, {
+		type : 'Ti.UI.ActivityIndicator',
+		bindId : 'ai',
+		properties : {
+			style : Titanium.UI.ActivityIndicatorStyle.PLAIN,
+			bottom : '5dp',
+			left : '80dp',
+			visible : true
+		}
+	}, {
 		type : 'Ti.UI.View',
 		properties : {
 			layout : 'vertical',
@@ -340,12 +349,41 @@ exports.channelsTemplate = {
 			}
 		}, {
 			type : 'Ti.UI.Label',
-			bindId : 'pubdate',
+			bindId : 'mtime',
 			properties : {
 				color : '#333',
 				top : '2dp',
 				font : {
-					fontFamily :fontFamily,
+					fontFamily : fontFamily,
+					fontSize : '10dp',
+				},
+				left : '80dip',
+				height : Ti.UI.SIZE,
+				right : '30dp',
+			}
+		}, {
+			type : 'Ti.UI.Label',
+			bindId : 'total',
+			properties : {
+				color : '#333',
+				top : '2dp',
+				font : {
+					fontFamily : fontFamily,
+					fontSize : '10dp',
+					fontWeight : 'bold'
+				},
+				left : '80dip',
+				height : Ti.UI.SIZE,
+				right : '30dp',
+			}
+		},{
+			type : 'Ti.UI.Label',
+			bindId : 'ctime',
+			properties : {
+				color : '#333',
+				top : '2dp',
+				font : {
+					fontFamily : fontFamily,
 					fontSize : '10dp',
 				},
 				left : '80dip',
@@ -355,4 +393,3 @@ exports.channelsTemplate = {
 		}]
 	}]
 };
-		

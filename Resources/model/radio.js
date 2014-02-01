@@ -197,7 +197,14 @@ Radio.prototype.saveChannel = function(_podcasts) {
 	}
 	//(id , title , station , logo , url , lastentry , filesize )
 	if (!total)
-		db.execute('INSERT INTO channels VALUES (?,?,?,?,?,?,?,?,0)', id, _podcasts.title, _podcasts.station, _podcasts.logo, _podcasts.feed, '', _podcasts.filesize, (new Date()).getTime());
+		db.execute('INSERT INTO channels VALUES (?,?,?,?,?,"",?,?,0,0,0)',
+		  id,  // id o feed (md5 hash of url)
+		  _podcasts.title,  // title
+		  _podcasts.station, // station
+		  _podcasts.logo, //
+		  _podcasts.feed, //
+		  _podcasts.filesize,  // for cheap version control
+		  (new Date()).getTime());  // ctime
 	db.close();
 };
 Radio.prototype.isChannelsaved = function(_podcasts) {
@@ -216,7 +223,9 @@ Radio.prototype.isChannelsaved = function(_podcasts) {
 
 Radio.prototype.getChannels = function() {
 	var db = Ti.Database.open(RADIOLIST);
-	var res = db.execute('SELECT *,url as media FROM channels');
+	var moment = require('vendor/moment');
+	moment.lang('de');
+	var res = db.execute('SELECT *,url as media FROM channels ORDER BY ctime DESC');
 	var channels = [];
 	var fields = ['id', 'total', 'podcast', 'title', 'station', 'logo', 'url', 'lastentry', 'filesize', 'ctime', 'done'];
 	while (res.isValidRow()) {
@@ -225,6 +234,9 @@ Radio.prototype.getChannels = function() {
 			channel[fields[i]] = res.fieldByName(fields[i]);
 		}
 		channel.feed = channel.url;
+		channel.lastentry_i18n = moment.unix(channel.lastentry).format('LLLL');
+		channel.ctime_i18n = moment(channel.ctime).format('LLLL');
+
 		if (!channel.logo)
 			channel.logo = '/images/' + channel.station + '.png';
 		channels.push(channel);
@@ -328,6 +340,18 @@ Radio.prototype.importList = function() {
 	return this;
 };
 
+Radio.prototype.fetchChannelSize = function() {
+	var options = arguments[0] || {};
+	var xhr = Ti.Network.createHTTPClient({
+		onload : function() {
+			var filesize = this.getResponseHeader('Content-Length');
+			options.onload(filesize);
+		}
+	});
+	xhr.open('HEAD', options.podcast.feed);
+	xhr.send();
+};
+
 Radio.prototype.getPodcast = function(_args) {
 	var link = Ti.Database.open(RADIOLIST);
 	function Elem2Text(_elem, _key) {
@@ -367,17 +391,19 @@ Radio.prototype.getPodcast = function(_args) {
 				var moment = require('vendor/moment');
 				moment.lang('de');
 				var doc = this.responseXML.documentElement;
+				var logo = doc.getElementsByTagName("itunes:image");
 				var items = doc.getElementsByTagName("item");
 				var podcasts = [];
 				Ti.Android && Ti.UI.createNotification({
 					message : items.length + ' Podcasts gefunden.'
 				}).show();
+				var moment = require('vendor/moment');
+				moment.lang('de');
 				for (var c = 0; c < items.length; c++) {
 					var item = items.item(c);
 					var title = Elem2Text(item, "title").replace(/&quot;/g, '"').replace(/#39;/g, '"');
 					var duration = Elem2Text(item, "itunes:duration");
 					var author = Elem2Text(item, "itunes:author");
-					var pubdate = moment(Elem2Text(item, "pubDate")).format('LLLL');
 					var description = Elem2Text(item, "description");
 					var summary = Elem2Text(item, "itunes:summary");
 					if (!summary && description) {
@@ -393,31 +419,47 @@ Radio.prototype.getPodcast = function(_args) {
 					}
 					var res = (description) ? /src="(.*?)"/g.exec(description) : null;
 					var state = getMyState(id) || {};
+					var pubdate_unix = moment(Elem2Text(item, "pubDate")).unix();
 					if (title.match(/\[PDF\]/i))
 						continue;
 					podcasts.push({
+						pubdate : moment.unix(pubdate_unix).format("LLLL"),
+						pubdate_unix : pubdate_unix,
 						title : title,
 						faved : state.faved,
 						cached : state.cached,
+						filesysize : filesize,
 						duration : (duration) ? duration : 'keine Angabe',
 						author : author,
-						pubdate : pubdate,
 						station : _args.podcastlist.station,
 						media : media,
 						summary : (summary) ? summary.trim() : null,
 						pict : (res) ? res[1] : '/images/' + _args.podcastlist.station + '.png'
 					});
 				}
+				podcasts.sort(function(a, b) {
+					if (a.pubdate_unix == b.pubdate_unix)
+						return 0;
+					if (a.pubdate_unix < b.pubdate_unix)
+						return 1;
+					if (a.pubdate_unix > b.pubdate_unix)
+						return -1;
+				});
+				var db = Ti.Database.open(RADIOLIST);
+				var lastentry = podcasts[0].pubdate_unix;
+				db.execute('UPDATE channels SET total=?,lastentry=?,filesize=? WHERE id=?', podcasts.length, lastentry, filesize, Ti.Utils.md5HexDigest(_args.podcastlist.feed));
+				db.close();
 				_args.onload({
 					podcasts : podcasts,
-					filesize : filesize
+					filesize : filesize,
+					lastentry : podcasts[0].pubdate,
+					total : podcasts.length
 				});
 				link.close();
 
 			}
 		});
 		xhr.open('GET', _args.podcastlist.feed, true);
-		console.log(_args.podcastlist.feed);
 		xhr.send();
 		Ti.App.addEventListener('app:exit', xhr.abort);
 	} else
@@ -429,7 +471,6 @@ Radio.prototype.getStationGroups = function() {
 };
 
 Radio.prototype.getSendungen = function() {
-	console.log('Info: try to open db, reading of sendungen');
 	var moment = require('vendor/moment');
 	var now = parseInt(moment().format('HH')) * 60 + parseInt(moment().format('m'));
 	function res2termin(res) {
