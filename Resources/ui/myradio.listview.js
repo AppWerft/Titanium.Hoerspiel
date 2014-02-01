@@ -22,7 +22,7 @@ exports.create = function() {
 			var podcast = podcasts[i];
 			switch (options.key) {
 				case 'channels':
-					var item = new Item(podcast,section);
+					var item = new Item(podcast,section,i);
 					items.push(item);
 					break;
 				default:

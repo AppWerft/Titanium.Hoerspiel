@@ -1,4 +1,4 @@
-var Item = function(_podcast, _section) {
+var Item = function(_podcast, _section, _ndx) {
 	var item = {
 		properties : {
 			itemId : JSON.stringify(_podcast),
@@ -21,6 +21,9 @@ var Item = function(_podcast, _section) {
 		},
 		ai : {
 			visible : true
+		},
+		newicon : {
+			visible : false
 		}
 	};
 	Ti.App.Model.fetchChannelSize({
@@ -30,8 +33,11 @@ var Item = function(_podcast, _section) {
 				Ti.UI.createNotification({
 					message : "„" + _podcast.title + '“\nhat neuen Beitrag gesendet.'
 				}).show();
+				item.newicon.visible = true;
+				item.newicon.height = Ti.UI.SIZE;
 			}
 			item.ai.visible = false;
+			_section.updateItemAt(_ndx, item);
 
 		}
 	});

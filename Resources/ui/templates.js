@@ -348,6 +348,17 @@ exports.channelsTemplate = {
 				height : Ti.UI.SIZE
 			}
 		}, {
+			type : 'Ti.UI.ImageView',
+			bindId : 'newicon',
+			properties : {
+				width : '40dip',
+				height : 0,
+				image:'/images/new.png',
+				top : '0dp',
+				visible : false,
+				left : '80dp'
+			}
+		}, {
 			type : 'Ti.UI.Label',
 			bindId : 'mtime',
 			properties : {
@@ -376,7 +387,7 @@ exports.channelsTemplate = {
 				height : Ti.UI.SIZE,
 				right : '30dp',
 			}
-		},{
+		}, {
 			type : 'Ti.UI.Label',
 			bindId : 'ctime',
 			properties : {
