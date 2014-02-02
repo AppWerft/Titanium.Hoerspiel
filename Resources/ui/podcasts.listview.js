@@ -40,7 +40,6 @@ exports.create = function() {
 		headerTitle : 'Westdeutscher Rundfunk',
 	});
 	require('model/podcasts/wdr').get(function(_podcasts) {
-		console.log(_podcasts);
 		sections[1].setItems(getItems(_podcasts, 'wdr'));
 		listView.setSections(sections);
 	});
@@ -87,14 +86,33 @@ exports.create = function() {
 	sections[9].setItems(getItems(require('model/podcasts/br').get(), 'br'));
 
 	sections[10] = Ti.UI.createListSection({
+		headerTitle : 'Radio Berlin-Brandenburg',
+	});
+	sections[10].setItems(getItems(require('model/podcasts/rbb').get(), 'rbb'));
+	sections[11] = Ti.UI.createListSection({
+		headerTitle : 'Südwestfunk',
+	});
+	sections[11].setItems(getItems(require('model/podcasts/swr').get(), 'swr'));
+	sections[12] = Ti.UI.createListSection({
+		headerTitle : 'Oesterreichischer Rundfunk',
+	});
+	sections[12].setItems(getItems(require('model/podcasts/orf').get(), 'orf'));
+	
+	
+	sections[13] = Ti.UI.createListSection({
+		headerTitle : 'RAI Bozen Südtirol',
+	});
+	sections[13].setItems(getItems(require('model/podcasts/raibz').get(), 'raibz'));
+
+	sections[14] = Ti.UI.createListSection({
 		headerTitle : 'freie-radios.net',
 	});
-	sections[10].setItems(getItems(require('model/podcasts/rwb').get(), 'rwb'));
+	sections[14].setItems(getItems(require('model/podcasts/rwb').get(), 'rwb'));
 
-	sections[11] = Ti.UI.createListSection({
+	sections[15] = Ti.UI.createListSection({
 		headerTitle : 'Ohrcast',
 	});
-	sections[11].setItems(getItems(require('model/podcasts/ohrcast').get(), 'ohrcast'));
+	sections[15].setItems(getItems(require('model/podcasts/ohrcast').get(), 'ohrcast'));
 	listView.addEventListener('itemclick', function(e) {
 		var win = require('ui/podcast.window').create(JSON.parse(e.itemId));
 		if (Ti.Android)

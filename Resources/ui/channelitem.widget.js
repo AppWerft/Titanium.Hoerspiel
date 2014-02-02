@@ -31,14 +31,13 @@ var Item = function(_podcast, _section, _ndx) {
 		onload : function(_filesize) {
 			if (_filesize != _podcast.filesize) {
 				Ti.UI.createNotification({
-					message : "„" + _podcast.title + '“\nhat neuen Beitrag gesendet.'
+					message : "„" + _podcast.title + '“\nhat neuen Beitrag eingestellt, der noch nicht gehört wurde.'
 				}).show();
 				item.newicon.visible = true;
 				item.newicon.height = Ti.UI.SIZE;
 			}
 			item.ai.visible = false;
 			_section.updateItemAt(_ndx, item);
-
 		}
 	});
 	return item;

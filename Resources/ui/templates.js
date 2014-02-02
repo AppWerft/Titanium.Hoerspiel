@@ -1,4 +1,8 @@
 var fontFamily = (Ti.Android) ? 'Droid Sans' : 'Helvetica Neue';
+function onchannellongpress(_e) {
+	console.log(_e);
+};
+
 exports.timelineactiveTemplate = {
 	properties : {
 		height : '100dip',
@@ -302,6 +306,7 @@ exports.podcastTemplate = {
 		}]
 	}]
 };
+
 exports.channelsTemplate = {
 	properties : {
 		height : Ti.UI.SIZE,
@@ -353,7 +358,7 @@ exports.channelsTemplate = {
 			properties : {
 				width : '40dip',
 				height : 0,
-				image:'/images/new.png',
+				image : '/images/new.png',
 				top : '0dp',
 				visible : false,
 				left : '80dp'

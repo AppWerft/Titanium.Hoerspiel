@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
     <id>de.appwerft.hoerspiel</id>
-    <name>Hörspiel2Go</name>
-    <version>1.34</version>
+    <name>Radio2Go</name>
+    <version>1.45</version>
     <publisher>rainerschleevoigt</publisher>
     <url>http://</url>
     <description>not specified</description>
@@ -43,9 +43,9 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="43" android:versionName="1.43">
+        <manifest android:versionCode="48" android:versionName="1.48">
             <uses-permission android:name="android.permission.INTERNET"/>
-            <application android:debuggable="false">
+            <application android:largeHeap="true" android:debuggable="false">
                 <activity android:configChanges="keyboardHidden"
                     android:name="org.appcelerator.titanium.TiActivity" android:screenOrientation="portrait"/>
                 <!--

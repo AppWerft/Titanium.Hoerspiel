@@ -84,6 +84,9 @@ exports.create = function() {
 				self.tab.open(win);
 		}
 	});
+	self.addEventListener('swipe', function(_evt) {
+		console.log(_evt);
+	});
 	self.update = updateList;
 	return self;
 };

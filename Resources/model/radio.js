@@ -33,9 +33,6 @@ Radio.prototype.getMobileplaywarning = function() {
 Radio.prototype.getMobiledownload = function() {
 	return (Ti.Network.getNetworkType() != Ti.Network.NETWORK_MOBILE || !Ti.App.Properties.getProperty('downloadonlywifi')) ? true : false;
 };
-Ti.App.Properties.addEventListener('change', function(_evt) {
-	console.log(_evt);
-});
 Radio.prototype.getQuota = function() {
 	var dir = getFilehandle();
 	var files = dir.getDirectoryListing();
@@ -71,9 +68,6 @@ Radio.prototype.resolvePlaylist = function(_args) {
 				if (uri)
 					bar.push(uri);
 			}
-			console.log(_args.playlist);
-			console.log(bar[0][0]);
-
 			_args.onload(bar[0][0]);
 		}
 	});
@@ -175,7 +169,6 @@ Radio.prototype.favMy = function(_args) {
 		var total = res.fieldByName('total');
 		console.log('Info: ' + total + ' gefunden');
 	}
-	console.log(_args.podcast);
 	if (total) {
 		db.execute('UPDATE myfavsandsaves SET faved=1 WHERE id=?', id);
 	} else
@@ -186,32 +179,30 @@ Radio.prototype.favMy = function(_args) {
 };
 
 Radio.prototype.saveChannel = function(_podcasts) {
-	console.log(_podcasts);
 	var id = Ti.Utils.md5HexDigest(_podcasts.feed);
 	var db = Ti.Database.open(RADIOLIST);
-	var res = db.execute('SELECT count(*) as total FROM channels WHERE id=?', id);
+	var res = db.execute('SELECT count(*) as total FROM podcastchannels WHERE id=?', id);
 	var now = (new Date).getTime();
 	if (res.isValidRow()) {
 		var total = res.fieldByName('total');
-		console.log('Info: ' + total + ' gefunden');
 	}
 	//(id , title , station , logo , url , lastentry , filesize )
 	if (!total)
-		db.execute('INSERT INTO channels VALUES (?,?,?,?,?,"",?,?,0,0,0)',
-		  id,  // id o feed (md5 hash of url)
-		  _podcasts.title,  // title
-		  _podcasts.station, // station
-		  _podcasts.logo, //
-		  _podcasts.feed, //
-		  _podcasts.filesize,  // for cheap version control
-		  (new Date()).getTime());  // ctime
+		db.execute('INSERT INTO podcastchannels VALUES (?,?,?,?,?,"",?,?,0,0,0)', id, // id o feed (md5 hash of url)
+		_podcasts.title, // title
+		_podcasts.station, // station
+		_podcasts.logo, //
+		_podcasts.feed, //
+		_podcasts.filesize, // for cheap version control
+		(new Date()).getTime());
+	// ctime
 	db.close();
 };
 Radio.prototype.isChannelsaved = function(_podcasts) {
 	var db = Ti.Database.open(RADIOLIST);
 	var id = Ti.Utils.md5HexDigest(_podcasts.feed);
 	var total = 0;
-	var res = db.execute('SELECT count(*) as total FROM channels WHERE id=?', id);
+	var res = db.execute('SELECT count(*) as total FROM podcastchannels WHERE id=?', id);
 	if (res.isValidRow()) {
 		total = res.fieldByName('total');
 		console.log('Info: ' + total + ' gefunden (' + id + ')');
@@ -225,7 +216,7 @@ Radio.prototype.getChannels = function() {
 	var db = Ti.Database.open(RADIOLIST);
 	var moment = require('vendor/moment');
 	moment.lang('de');
-	var res = db.execute('SELECT *,url as media FROM channels ORDER BY ctime DESC');
+	var res = db.execute('SELECT *,url as media FROM podcastchannels ORDER BY ctime DESC');
 	var channels = [];
 	var fields = ['id', 'total', 'podcast', 'title', 'station', 'logo', 'url', 'lastentry', 'filesize', 'ctime', 'done'];
 	while (res.isValidRow()) {
@@ -256,7 +247,6 @@ Radio.prototype.recentMy = function(_args) {
 		var total = res.fieldByName('total');
 		console.log('Info: ' + total + ' gefunden');
 	}
-	console.log(_args.podcast);
 	if (total) {
 		db.execute('UPDATE myfavsandsaves SET count=count+1 WHERE id=?', id);
 	} else
@@ -274,16 +264,7 @@ Radio.prototype.importList = function() {
 		link.execute('CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime INTEGER, mtime INTEGER, count INTEGER,faved INTEGER, localcached INTEGER)');
 		link.execute('DROP TABLE IF EXISTS termine');
 		link.execute('DROP TABLE IF EXISTS sender');
-		link.execute('CREATE TABLE IF NOT EXISTS channels (id TEXT, title TEXT, station TEXT, logo TEXT, url TEXT, lastentry NUMERIC, filesize NUMERIC, ctime NUMERIC, done NUMERIC)');
-		var res = link.execute('SELECT count(*) total FROM sqlite_master WHERE type="table"');
-		if (res.isValidRow()) {
-			var total = res.fieldByName('total');
-			res.close();
-		}
-		if (total == 9) {
-			link.execute('ALTER TABLE channels ADD COLUMN total NUMERIC');
-			link.execute('ALTER TABLE channels ADD COLUMN podcast TEXT');
-		}
+		link.execute('CREATE TABLE IF NOT EXISTS podcastchannels (id TEXT, title TEXT, station TEXT, logo TEXT, url TEXT, lastentry NUMERIC, filesize NUMERIC, ctime NUMERIC, done NUMERIC,total NUMERIC,podcast TEXT)');
 		link.execute('CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)');
 		link.execute('CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT, livestreamurl TEXT)');
 		console.log('Info:db installed/opened, now import begins');
@@ -380,6 +361,7 @@ Radio.prototype.getPodcast = function(_args) {
 
 	if (true == Ti.Network.online) {
 		var xhr = Ti.Network.createHTTPClient({
+			timeout: 60000,
 			ondatastream : function(e) {
 				_args.onprogress(e.progress);
 			},
@@ -422,6 +404,9 @@ Radio.prototype.getPodcast = function(_args) {
 					var pubdate_unix = moment(Elem2Text(item, "pubDate")).unix();
 					if (title.match(/\[PDF\]/i))
 						continue;
+					if (summary) {
+						summary = summary.replace(/(<.*$)/, '');
+					}
 					podcasts.push({
 						pubdate : moment.unix(pubdate_unix).format("LLLL"),
 						pubdate_unix : pubdate_unix,
@@ -447,7 +432,7 @@ Radio.prototype.getPodcast = function(_args) {
 				});
 				var db = Ti.Database.open(RADIOLIST);
 				var lastentry = podcasts[0].pubdate_unix;
-				db.execute('UPDATE channels SET total=?,lastentry=?,filesize=? WHERE id=?', podcasts.length, lastentry, filesize, Ti.Utils.md5HexDigest(_args.podcastlist.feed));
+				db.execute('UPDATE podcastchannels SET total=?,lastentry=?,filesize=? WHERE id=?', podcasts.length, lastentry, filesize, Ti.Utils.md5HexDigest(_args.podcastlist.feed));
 				db.close();
 				_args.onload({
 					podcasts : podcasts,
@@ -455,8 +440,8 @@ Radio.prototype.getPodcast = function(_args) {
 					lastentry : podcasts[0].pubdate,
 					total : podcasts.length
 				});
+				doc = null;
 				link.close();
-
 			}
 		});
 		xhr.open('GET', _args.podcastlist.feed, true);
@@ -504,7 +489,6 @@ Radio.prototype.getSendungen = function() {
 	var termine = [[], [], []];
 	while (res.isValidRow()) {
 		termin = res2termin(res);
-		//	console.log(termin);
 		if (now >= res.fieldByName('start'))
 			termine[0].push(termin);
 		else {

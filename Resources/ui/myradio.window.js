@@ -10,6 +10,9 @@ exports.create = function() {
 	self.podcastwidget = new (require('ui/radio.widget'))();
 
 	var types = [{
+		key : 'channels',
+		title : 'Vorgemerkte Kanäle'
+	},{
 		key : 'cached',
 		title : 'Offline - Podcast'
 	}, {
@@ -18,9 +21,6 @@ exports.create = function() {
 	}, {
 		key : 'recent',
 		title : 'Letztgehörte Beiträge'
-	}, {
-		key : 'channels',
-		title : 'Vorgemerkte Kanäle'
 	}];
 	var depotlistviews = [];
 	for (var i = 0; i < types.length; i++) {
