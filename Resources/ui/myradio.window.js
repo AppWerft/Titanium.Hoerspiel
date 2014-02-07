@@ -6,7 +6,7 @@ exports.create = function() {
 	var self = Ti.UI.createWindow({
 		backgroundImage : 'default.png'
 	});
-
+Ti.App.addEventListener('app:dataready', function() {
 	self.podcastwidget = new (require('ui/radio.widget'))();
 
 	var types = [{
@@ -58,7 +58,7 @@ exports.create = function() {
 		depotlistviews[self.scrollableView.currentPage].update && depotlistviews[self.scrollableView.currentPage].update();
 	});
 	self.add(self.podcastwidget.getView());
-
+});
 	return self;
 
 };

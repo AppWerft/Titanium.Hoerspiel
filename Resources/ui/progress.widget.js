@@ -64,9 +64,7 @@ exports.create = function() {
         self.setTitle = function(_foo) {
                 self.title.setText(_foo);
         };
-        self.setProgress = function(e) {
-                self.progress.setValue(e);
-        };
+        
         self.setMessage = function(_foo) {
                 self.message.setText(_foo);
         };

@@ -43,7 +43,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="48" android:versionName="1.48">
+        <manifest android:versionCode="49" android:versionName="1.49">
             <uses-permission android:name="android.permission.INTERNET"/>
             <application android:largeHeap="true" android:debuggable="false">
                 <activity android:configChanges="keyboardHidden"

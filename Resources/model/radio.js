@@ -24,7 +24,10 @@ var Radio = function() {
 	if (!(this instanceof Radio)) {
 		return new Radio();
 	}
-	return this.importList();
+	this.dataready= false;
+	var res= this.importList();
+	Ti.App.fireEvent('app:dataready');
+	return res;
 };
 
 Radio.prototype.getMobileplaywarning = function() {

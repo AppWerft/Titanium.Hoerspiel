@@ -7,6 +7,7 @@ exports.create = function() {
 		height : Ti.UI.FILL,
 		backgroundColor : '#fff'
 	});
+	Ti.App.addEventListener('app:dataready', function() {
 	self.tweetList.addEventListener('click', require('ui/twitter/dialog.widget').create);
 	
 	function updateTweetsOnGUI() {
@@ -31,7 +32,7 @@ exports.create = function() {
 			}
 		});
 	});
-	updateTweetsOnGUI();
+	updateTweetsOnGUI();});
 	return self;
 };
 

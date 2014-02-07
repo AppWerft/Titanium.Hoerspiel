@@ -69,7 +69,7 @@ TwitterAdapter.prototype.clearAccessToken = function() {
 
 // send a tweet (only if accesstoken is present)
 TwitterAdapter.prototype.addTweet = function(_args) {
-	if (!_args.tweet.match(/ndwhh/))
+	if (!_args.tweet.match(/#hörspiel/i))
 		_args.tweet += ' #Hörspiel';
 	this.cb.__call("statuses_update", {
 		"status" : _args.tweet
