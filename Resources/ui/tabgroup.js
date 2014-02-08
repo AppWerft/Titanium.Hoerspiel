@@ -17,16 +17,18 @@ exports.create = function() {// this sets the background color of the master UIV
 				}, 3000);
 			});
 			self.actionBar = self.activity.actionBar;
-			if (self.actionBar){self.activity.onCreateOptionsMenu = function(e) {
-				e.menu.clear();
-				e.activity = self.activity;
-				e.actionBar = self.actionBar;
-				self.activeTab.fireEvent('onCreateOptionsMenu', e);
-			};
-			self.activity.onPrepareOptionsMenu = function(e) {
-				self.activeTab.fireEvent('onPrepareOptionsMenu', e);
-			};
-			self.activity.invalidateOptionsMenu();}
+			if (self.actionBar) {
+				self.activity.onCreateOptionsMenu = function(e) {
+					e.menu.clear();
+					e.activity = self.activity;
+					e.actionBar = self.actionBar;
+					self.activeTab.fireEvent('onCreateOptionsMenu', e);
+				};
+				self.activity.onPrepareOptionsMenu = function(e) {
+					self.activeTab.fireEvent('onPrepareOptionsMenu', e);
+				};
+				self.activity.invalidateOptionsMenu();
+			}
 		}
 	});
 	self.addEventListener('focus', function(e) {
@@ -59,7 +61,7 @@ exports.create = function() {// this sets the background color of the master UIV
 		self.actionBar.setTitle('Alle Sender im Überblick');
 		self.actionBar.setIcon('/images/appicon.png');
 	});
-	tabs[2].addEventListener('focus', function(_e) {
+	tabs[2].addEventListener('onCreateOptionsMenu', function(_e) {
 		self.actionBar.setTitle('Podcasts (auch zum Mitnehmen)');
 		self.actionBar.setIcon('/images/appicon.png');
 	});
@@ -104,5 +106,5 @@ exports.create = function() {// this sets the background color of the master UIV
 			//e.activity.invalidateOptionsMenu();
 		});
 	});
-	
+
 };
