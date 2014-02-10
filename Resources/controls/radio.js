@@ -8,7 +8,11 @@ String.prototype.ltrim = function() {
 String.prototype.rtrim = function() {
 	return this.replace(/\s+$/, "");
 };
-
+if (!Array.isArray) {
+	Array.isArray = function(vArg) {
+		return Object.prototype.toString.call(vArg) === "[object Array]";
+	};
+}
 var getFilehandle = function(filename) {
 	var dir = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, 'cachefolder') : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'cachefolder');
 	if (!dir.exists()) {
@@ -23,16 +27,64 @@ var Radio = function() {
 	var sql = null;
 	var link = Ti.Database.open(RADIOLIST);
 	if (link) {
-		
-		var queries = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'controls', 'radio.sql').read().text.split(';');
+		var queries = [//
+		'BEGIN', //
+		'CREATE TABLE IF NOT EXISTS myfavsandsaves (id TEXT, podcast TEXT, ctime INTEGER, mtime INTEGER, count INTEGER,faved INTEGER, localcached INTEGER)', //
+		'DROP TABLE IF EXISTS termine', //
+		'DROP TABLE IF EXISTS sender', //
+		'CREATE TABLE IF NOT EXISTS podcastchannels (id TEXT, title TEXT, station TEXT, logo TEXT, url TEXT, lastentry NUMERIC, filesize NUMERIC, ctime NUMERIC, done NUMERIC,total NUMERIC,podcast TEXT)', //
+		'CREATE TABLE IF NOT EXISTS termine (wd NUMERIC, start NUMERIC, stop NUMERIC, name TEXT, senderid TEXT, sendungid TEXT,livestreamurl TEXT)', //
+		'CREATE TABLE IF NOT EXISTS sender(id TEXT,name TEXT,longname TEXT, livestreamurl TEXT)', //
+		'CREATE TABLE IF NOT EXISTS myfavstations (id TEXT,name TEXT,longname TEXT, logo TEXT,ctime NUMERIC,mtime NUMERIC, playlisturl TEXT, livestreamurl TEXT)', //
+		'COMMIT'//
+		];
+		//
 		while ( sql = queries.shift()) {
-			link.execute(sql);
+			console.log('Info: sql=' + sql);
+			link.execute(sql + ';');
 		}
 		link.close();
-		Ti.App.fireEvent('app:dataready');
+		this.getAllStationList();
 		return this;
 	} else
-		console.log('Warning: cannot access DB');
+		console.log('Warning: cannot access DB !!!!!!!!!');
+};
+
+Radio.prototype.getAllStationList = function() {
+	// result of:
+	// http://query.yahooapis.com/v1/public/yql?q=SELECT%20*%20FROM%20html%20WHERE%20url%3D%22http%3A%2F%2Fwww.listenlive.eu%2Fgermany.html%22%20and%20xpath%3D%22%2F%2Ftbody%22&format=json&diagnostics=true&callback=
+	var list = JSON.parse(Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'model', 'stations.json').read().text).query.results.tbody.tr;
+	var tr = null, stations = [], found = false, station = null;
+	list.shift();
+	// supress header
+	while ( tr = list.shift()) {
+		if (tr.td[0].strong) {
+			station = {
+				link : tr.td[0].strong.a.href,
+				title : tr.td[0].strong.a.strong
+			};
+		} else {
+			station = {
+				link : tr.td[0].a.href,
+				title : tr.td[0].a.strong
+			};
+		}
+		station.location = tr.td[1].p;
+		station.speed = tr.td[3].content;
+		station.genre = tr.td[4].p;
+		if (tr.td[2].push) {
+			console.log('!');
+		} else {
+			if (tr.td[2].img.alt == 'MP3') {
+				station.media = tr.td[3].a.href;
+				stations.push(station);
+				//			console.log(station);
+			}
+		}
+	}
+	list = null;
+	console.log(stations.length);
+
 };
 
 Radio.prototype.getMobileplaywarning = function() {
@@ -265,10 +317,13 @@ Radio.prototype.recentMy = function(_args) {
 };
 
 Radio.prototype.importRadiolist = function(_callback) {
+	console.log('Info: start importing radiolist');
 	var self = this, groups;
 	groups = (Ti.App.Properties.hasProperty(RADIOLIST)) ? Ti.App.Properties.getList(RADIOLIST) : JSON.parse(Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'controls', 'senderliste.json').read().text);
+	var md5 = Ti.Utils.md5HexDigest(JSON.stringify(groups));
 	// persists in DB + properties;
 	require('controls/persistence').save(RADIOLIST, groups);
+	_callback(groups);
 	if (Ti.Network.online) {
 		var yql = 'SELECT * FROM xml WHERE url="' + Ti.App.Properties.getString('radiourl') + '"';
 		Ti.Yahoo.yql(yql, function(e) {
@@ -276,11 +331,14 @@ Radio.prototype.importRadiolist = function(_callback) {
 				if (e.data.senderliste) {
 					groups = e.data.senderliste.senderfamilie;
 					require('controls/persistence').save(RADIOLIST, groups);
-					_callback(groups);
+					if (md5 != Ti.Utils.md5HexDigest(JSON.stringify(groups)))
+						_callback(groups);
 				}
-			} else _callback(groups);
+			} else
+				_callback(groups);
 		});
-	} else _callback(groups);
+	} else
+		_callback(groups);
 };
 
 Radio.prototype.fetchChannelSize = function() {
@@ -446,7 +504,7 @@ Radio.prototype.getSendungen = function() {
 	var wd = moment().format('e');
 	if (wd == 0)
 		wd = 7;
-	var q = 'SELECT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
+	var q = 'SELECT DISTINCT termine.*,sender.longname AS longname FROM termine,sender WHERE sender.id=termine.senderid AND wd=' + wd + ' AND stop>' + stop + ' ORDER BY start';
 	var res = link.execute(q);
 	var termine = [[], [], []];
 	while (res.isValidRow()) {

@@ -2,7 +2,7 @@
 <ti:app xmlns:ti="http://ti.appcelerator.org">
     <id>de.appwerft.hoerspiel</id>
     <name>Radio2Go</name>
-    <version>1.45</version>
+    <version>1.55</version>
     <publisher>rainerschleevoigt</publisher>
     <url>http://</url>
     <description>not specified</description>
@@ -43,7 +43,7 @@
     </ios>
     <android xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-sdk>14</uses-sdk>
-        <manifest android:versionCode="51" android:versionName="1.51">
+        <manifest android:versionCode="55" android:versionName="1.55">
             <uses-permission android:name="android.permission.INTERNET"/>
             <application android:largeHeap="true" android:debuggable="false">
                 <activity android:configChanges="keyboardHidden"
@@ -55,7 +55,7 @@
                 -->
                 <activity android:configChanges="keyboardHidden"
                     android:label=""
-                    android:name="ti.modules.titanium.ui.TiTabActivity" android:screenOrientation="portrait"/>
+                    android:name="ti.modules.titanium.ui.TiTabActivity" android:screenOrientation="sensorPortrait"/>
             </application>
         </manifest>
     </android>

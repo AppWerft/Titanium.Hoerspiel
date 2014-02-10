@@ -53,16 +53,15 @@ var Radio = function() {
 	Ti.App.audioPlayer.addEventListener('change', function(_e) {
 		self.progress.value = 0;
 		self.progress.view.setWidth(0);
-		switch (_e.description) {
-			case 'stopped':
-				self.vumeter.stop();
-				self.playing = false;
-				break;
-			case 'playing':
-				self.cron && clearInterval(self.cron);
-				self.playing = true;
-				self.vumeter.start();
-				break;
+		console.log(_e.description);
+		if (_e.description == 'playing') {
+			self.vumeter.start();
+			self.cron && clearInterval(self.cron);
+			self.playing = true;
+			
+		} else {
+			self.vumeter.stop();
+			self.playing = false;
 		}
 	});
 	this.radiocontainer.addEventListener('click', function() {
@@ -84,10 +83,10 @@ Radio.prototype.getView = function() {
 
 Radio.prototype.togglePlay = function(_options) {
 	var media = _options.media;
-	
+
 	var senderlongname = _options.senderlongname || _options.title;
 	if (senderlongname == this.last.name) {
-		console.log('Warning: same station:' + senderlongname +'|'+this.last.name);
+		console.log('Warning: same station:' + senderlongname + '|' + this.last.name);
 		return;
 	}
 	if (Ti.App.audioPlayer.playing == true) {

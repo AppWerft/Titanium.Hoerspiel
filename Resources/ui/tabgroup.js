@@ -1,8 +1,9 @@
 exports.create = function() {// this sets the background color of the master UIView (when there are no windows/tab groups on it)
 	var self = Ti.UI.createTabGroup({
 		fullscreen : true,
-		exitOnClose : true
+		exitOnClose : true,
 	});
+	self.orientationModes = [Ti.UI.PORTRAIT, Ti.UI.UPSIDE_PORTRAIT];
 	self.open();
 	if (Ti.Network.online == false) {
 		alert("Radio2Go braucht das Internet.");
@@ -22,10 +23,7 @@ exports.create = function() {// this sets the background color of the master UIV
 					e.menu.clear();
 					e.activity = self.activity;
 					e.actionBar = self.actionBar;
-					self.activeTab.fireEvent('onCreateOptionsMenu', e);
-				};
-				self.activity.onPrepareOptionsMenu = function(e) {
-					self.activeTab.fireEvent('onPrepareOptionsMenu', e);
+					self.activeTab && self.activeTab.fireEvent('onCreateOptionsMenu', e);
 				};
 				self.activity.invalidateOptionsMenu();
 			}
@@ -58,8 +56,20 @@ exports.create = function() {// this sets the background color of the master UIV
 		self.actionBar.setIcon('/images/appicon.png');
 	});
 	tabs[1].addEventListener('onCreateOptionsMenu', function(_e) {
-		self.actionBar.setTitle('Alle Sender im Überblick');
+		self.actionBar.setTitle('Öffentlich-rechtliche Sender');
 		self.actionBar.setIcon('/images/appicon.png');
+		_e.menu.add({
+			title : "Alle Sender",
+			icon : '/images/out.png',
+			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+			itemId : 1
+		}).addEventListener("click", function() {
+			//Ti.UI.Android.openPreferences();
+			//e.activity.invalidateOptionsMenu();
+		});
+
+		
+		
 	});
 	tabs[2].addEventListener('onCreateOptionsMenu', function(_e) {
 		self.actionBar.setTitle('Podcasts (auch zum Mitnehmen)');

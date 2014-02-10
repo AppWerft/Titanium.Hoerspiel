@@ -1,5 +1,6 @@
 exports.save = function(RADIOLIST, groups) {
 	var link =Ti.Database.open(RADIOLIST);
+	console.log('Info: start saving to DB, groups length = '+ groups.length);
 	link.execute('BEGIN');
 	// Sendergruppen
 	for (var i = 0; i < groups.length; i++) {

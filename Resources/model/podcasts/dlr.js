@@ -16,7 +16,6 @@ exports.get = function(_callback) {
 				var match, pattern = /<a.*?href="(.*?podcast\.xml)".*?>\s*<img.*?src="(.*?)".*?class="dradioImage".*?title="(.*?)".*?><\/a>/gim;
 				while ( match = pattern.exec(html)) {
 					match.shift();
-					console.log(match);
 					var feed = match[0];
 					var logo = match[1];
 					var title = match[2].replace(/^Podcast /, '');

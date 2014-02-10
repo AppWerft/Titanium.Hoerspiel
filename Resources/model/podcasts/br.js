@@ -1,5 +1,14 @@
 exports.get = function(_callback) {
 	var data = {
+		"computermagazin" : "Das Computermagazin",
+		"iq" : "IQ - Wissenschaft und Forschung",
+		"schlau-beer" : "Schlau-Beer",
+		"kalenderblatt" : "Kalenderblatt",
+		"radiowissen" : "Radio-Wissen",
+		"sozusagen" : "So|zu|sa|gen",
+		"umweltkommissar" : "Umweltkommissar",
+		"henning-wiesners-tierwelt" : "Henning Wiesners Tierwelt",
+		"aus-wissenschaft-und-technik" : "Aus Wissenschaft und Technik",
 		"auf-ein-wort" : "Auf ein Wort",
 		"betthupferl" : "Betthupferl",
 		"blaue-couch" : "Blaue Couch",
@@ -11,21 +20,6 @@ exports.get = function(_callback) {
 		"heute-im-stadion" : "Heute im Stadion",
 		"katholische-morgenfeier" : "Katholische Morgenfeier",
 		"toni-lauerer" : "Toni Lauerer",
-		"" : "",
-		"" : "",
-		"" : "",
-
-	}, podcasts = [];
-	for (var key in data) {
-		if (key)
-			podcasts.push({
-				feed : 'http://www.br-online.de/podcast/' + key + '/cast.xml',
-				station : 'br',
-				logo : 'http://www.br-online.de/podcast/' + key + '/cover.jpg',
-				title : data[key]
-			});
-	}
-	data = {
 		"artmix-galerie-audio" : "Artmix.Galerie",
 		"bayerisches-feuilleton" : "Bayerisches Feuilleton",
 		"bayernkommentar" : "Bayernkommentar",
@@ -37,7 +31,7 @@ exports.get = function(_callback) {
 		"ende-der-welt" : "Ende der Welt",
 		"evangelische-perspektiven" : "Evangelische Perspektiven",
 		"orange-mit-fruehbeis-zu-berge" : "orange Mit Frühbeis zu Berge"
-	};
+	}, podcasts = [];
 	for (var key in data) {
 		if (key)
 			podcasts.push({
@@ -47,7 +41,6 @@ exports.get = function(_callback) {
 				title : data[key]
 			});
 	}
-
 	_callback && _callback(podcasts);
 	return podcasts;
 };

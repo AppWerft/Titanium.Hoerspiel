@@ -9,5 +9,12 @@ exports.create = function(_sender) {
 		enableZoomControls : false
 	});
 	self.add(www);
+	self.addEventListener("open", function() {
+		if (Ti.Android && self.getActivity()) {
+			var activity = self.getActivity();
+			var actionbar = activity.actionBar;
+			actionbar && actionbar.setTitle(_sender.longname);
+		}
+	});
 	return self;
 };

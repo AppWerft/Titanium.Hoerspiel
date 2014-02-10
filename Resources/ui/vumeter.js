@@ -19,7 +19,9 @@ exports.create = function(_options) {
 		self.vu.hide();
 	};
 	self.start = function() {
+		console.log('Info: show zappler');
 		self.vu.show();
+		self.vu.visible = true;
 	};
 	return self;
 };
