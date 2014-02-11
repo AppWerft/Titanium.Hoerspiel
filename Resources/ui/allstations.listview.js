@@ -16,7 +16,6 @@ exports.create = function() {
 		var group = allstations[location];
 		for (var s = 0; s < group.length; s++) {
 			var sender = group[s];
-			console.log(sender);
 			stations.push({
 				properties : {
 					itemId : JSON.stringify(sender),

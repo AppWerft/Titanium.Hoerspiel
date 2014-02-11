@@ -1,14 +1,11 @@
 exports.create = function() {
-	console.log('Info: start map rendering  with laoding of module ============');
 	var MapModule = require('ti.map');
-	console.log('Info: start map rendering ======================================');
 	var rc = MapModule.isGooglePlayServicesAvailable();
 	switch (rc) {
 		case MapModule.SUCCESS:
-			Ti.API.info('Google Play services is installed.');
 			break;
 		case MapModule.SERVICE_MISSING:
-			alert('Google Play services is missing. Please install Google Play services from the Google Play store.');
+			alert('„Google Play services“ fehlt. Bitte im Playstore installieren.');
 		  	break;
 		case MapModule.SERVICE_VERSION_UPDATE_REQUIRED:
 			alert('Google Play services is out of date. Please update Google Play services.');
@@ -31,7 +28,6 @@ exports.create = function() {
 		animate : false,
 		userLocationButton : true,
 		enableZoomControls : false,
-		visible : true,
 		region : {
 			latitude : 33,
 			longitude : 10,

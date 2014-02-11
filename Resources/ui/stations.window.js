@@ -1,13 +1,13 @@
 exports.create = function() {
 	var self = Ti.UI.createWindow({});
-	self.publiclist = require('ui/publicstations.listview').create();
-	self.alllist = require('ui/allstations.listview').create();
 	self.mapview = require('ui/map.widget').create();
-	console.log(self.mapview.apiName);
-	console.log(self.publiclist.apiName);
+	if (self.mapview.apiName != 'Ti.Proxy')
+		self.add(self.mapview);
+		self.publiclist = require('ui/publicstations.listview').create();
+	self.alllist = require('ui/allstations.listview').create();
+
 	self.add(self.publiclist);
 	self.add(self.alllist);
-	self.add(self.mapview);
 	self.setList = function(_type) {
 		switch (_type) {
 			case 'public':
@@ -28,6 +28,6 @@ exports.create = function() {
 				break;
 		}
 	};
-	self.setList('public');
+	//self.setList('public');
 	return self;
 };

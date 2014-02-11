@@ -294,7 +294,6 @@ Radio.prototype.isChannelsaved = function(_podcasts) {
 	var res = db.execute('SELECT count(*) as total FROM podcastchannels WHERE id=?', id);
 	if (res.isValidRow()) {
 		total = res.fieldByName('total');
-		console.log('Info: ' + total + ' gefunden (' + id + ')');
 		res.close();
 	}
 	db.close();
