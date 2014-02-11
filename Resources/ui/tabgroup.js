@@ -64,12 +64,25 @@ exports.create = function() {// this sets the background color of the master UIV
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 1
 		}).addEventListener("click", function() {
+			if (self.allstations) {
+				_e.menu.getItem(0).setIcon('/images/out.png');
+				self.actionBar.setTitle('Öffentlich-rechtliche Sender');
+				tabs[1].window.fireEvent('setType', {
+					type : 'public'
+				});
+				self.allstations = false;
+			} else {
+				tabs[1].window.fireEvent('setType', {
+					type : 'all'
+				});
+				self.actionBar.setTitle('Alle Sender');
+				_e.menu.getItem(0).setIcon('/images/in.png');
+				self.allstations = true;
+			}
 			//Ti.UI.Android.openPreferences();
 			//e.activity.invalidateOptionsMenu();
 		});
 
-		
-		
 	});
 	tabs[2].addEventListener('onCreateOptionsMenu', function(_e) {
 		self.actionBar.setTitle('Podcasts (auch zum Mitnehmen)');
