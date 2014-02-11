@@ -8,11 +8,15 @@ String.prototype.ltrim = function() {
 String.prototype.rtrim = function() {
 	return this.replace(/\s+$/, "");
 };
-if (!Array.isArray) {
-	Array.isArray = function(vArg) {
-		return Object.prototype.toString.call(vArg) === "[object Array]";
-	};
-}
+var isArray = ( function() {
+		if (Array.isArray) {
+			return Array.isArray;
+		}
+		var objectToStringFn = Object.prototype.toString, arrayToStringResult = objectToStringFn.call([]);
+		return function(subject) {
+			return objectToStringFn.call(subject) === arrayToStringResult;
+		};
+	}());
 var getFilehandle = function(filename) {
 	var dir = Ti.Filesystem.isExternalStoragePresent() ? Ti.Filesystem.getFile(Ti.Filesystem.externalStorageDirectory, 'cachefolder') : Ti.Filesystem.getFile(Ti.Filesystem.applicationDataDirectory, 'cachefolder');
 	if (!dir.exists()) {
@@ -40,11 +44,9 @@ var Radio = function() {
 		];
 		//
 		while ( sql = queries.shift()) {
-			console.log('Info: sql=' + sql);
 			link.execute(sql + ';');
 		}
 		link.close();
-		this.getAllStationList();
 		return this;
 	} else
 		console.log('Warning: cannot access DB !!!!!!!!!');
@@ -54,37 +56,64 @@ Radio.prototype.getAllStationList = function() {
 	// result of:
 	// http://query.yahooapis.com/v1/public/yql?q=SELECT%20*%20FROM%20html%20WHERE%20url%3D%22http%3A%2F%2Fwww.listenlive.eu%2Fgermany.html%22%20and%20xpath%3D%22%2F%2Ftbody%22&format=json&diagnostics=true&callback=
 	var list = JSON.parse(Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, 'model', 'stations.json').read().text).query.results.tbody.tr;
-	var tr = null, stations = [], found = false, station = null;
+	var tr = null, stations = {}, found = false, station = null;
 	list.shift();
 	// supress header
 	while ( tr = list.shift()) {
+		var location = tr.td[1].p;
+		if (!stations[location])
+			stations[location] = [];
+
 		if (tr.td[0].strong) {
 			station = {
-				link : tr.td[0].strong.a.href,
-				title : tr.td[0].strong.a.strong
+				programmurl : tr.td[0].strong.a.href,
+				longname : tr.td[0].strong.a.strong
 			};
 		} else {
 			station = {
-				link : tr.td[0].a.href,
-				title : tr.td[0].a.strong
+				programmurl : tr.td[0].a.href,
+				longname : tr.td[0].a.strong
 			};
 		}
-		station.location = tr.td[1].p;
 		station.speed = tr.td[3].content;
 		station.genre = tr.td[4].p;
-		if (tr.td[2].push) {
-			console.log('!');
+		if (isArray(tr.td[2].img)) {
+			var found = false;
+			for (var i = 0; i < tr.td[2].img.length; i++) {
+				if (tr.td[2].img[i].alt == 'MP3') {
+					found = true;
+					break;
+				}
+			}
+			if (found) {
+				if (tr.td[3].p) {
+					station.livestream = {
+						url : tr.td[3].p.a[i].href,
+					};
+					station.speed = tr.td[3].p.a[i].content;
+				} else {
+					station.livestream = {
+						url : tr.td[3].a[i].href,
+					};
+					station.speed = tr.td[3].a[i].content;
+				}
+			}
 		} else {
 			if (tr.td[2].img.alt == 'MP3') {
-				station.media = tr.td[3].a.href;
-				stations.push(station);
+				station.livestream = {
+					url : tr.td[3].a.href
+				};
+				stations[location].push(station);
 				//			console.log(station);
 			}
 		}
 	}
 	list = null;
-	console.log(stations.length);
-
+	for (var location in stations) {
+		if (stations[location].length == 0)
+			delete stations[location];
+	}
+	return stations;
 };
 
 Radio.prototype.getMobileplaywarning = function() {

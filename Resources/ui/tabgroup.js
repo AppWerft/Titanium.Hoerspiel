@@ -59,24 +59,36 @@ exports.create = function() {// this sets the background color of the master UIV
 		self.actionBar.setTitle('Öffentlich-rechtliche Sender');
 		self.actionBar.setIcon('/images/appicon.png');
 		_e.menu.add({
+			title : "Karte der Sender",
+			icon : '/images/map.png',
+			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
+			itemId : 0,
+			visible : false
+		}).addEventListener("click", function() {
+			self.actionBar.setTitle('Karte aller Sender');
+			tabs[1].window.setList('map');
+		});
+
+		_e.menu.add({
 			title : "Alle Sender",
 			icon : '/images/out.png',
 			showAsAction : Ti.Android.SHOW_AS_ACTION_ALWAYS,
 			itemId : 1
 		}).addEventListener("click", function() {
 			if (self.allstations) {
-				_e.menu.getItem(0).setIcon('/images/out.png');
+				_e.menu.getItem(1).setIcon('/images/out.png');
+				_e.menu.getItem(0).setVisible(false);
+
 				self.actionBar.setTitle('Öffentlich-rechtliche Sender');
-				tabs[1].window.fireEvent('setType', {
-					type : 'public'
-				});
+				tabs[1].window.setList('public');
+
 				self.allstations = false;
 			} else {
-				tabs[1].window.fireEvent('setType', {
-					type : 'all'
-				});
+				tabs[1].window.setList('all');
 				self.actionBar.setTitle('Alle Sender');
-				_e.menu.getItem(0).setIcon('/images/in.png');
+				_e.menu.getItem(1).setIcon('/images/in.png');
+				_e.menu.getItem(0).setVisible(true);
+
 				self.allstations = true;
 			}
 			//Ti.UI.Android.openPreferences();

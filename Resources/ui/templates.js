@@ -409,3 +409,38 @@ exports.channelsTemplate = {
 		}]
 	}]
 };
+
+exports.allstationsTemplate = {
+	properties : {
+		height : Ti.UI.SIZE,
+		layout : 'vertical',
+		backgroundColor : 'white'
+	},
+	childTemplates : [{
+		type : 'Ti.UI.Label',
+		bindId : 'longname',
+		properties : {
+			color : '#333',
+			font : {
+				fontFamily : fontFamily,
+				fontWeight : 'bold',
+				fontSize : '18dp',
+			},
+			top : '10dp',
+			left : '10dip',
+			right : '30dp'
+		}
+	},{
+		type : 'Ti.UI.Label',
+		bindId : 'genre',
+		properties : {
+			color : '#333',text:'keine Angabe zum Genre',
+			font : {
+				fontFamily : fontFamily,
+				fontSize : '12dp',
+			},
+			top : '5dp',bottom:'5dp',
+			left : '10dp'
+		}
+	}]
+}; 
