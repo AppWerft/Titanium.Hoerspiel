@@ -6,7 +6,7 @@ exports.create = function(_sender) {
 	var www = Ti.UI.createWebView({
 		url : _sender.url,
 		disableBounce : true,
-		enableZoomControls : false
+		enableZoomControls : true
 	});
 	self.add(www);
 	self.addEventListener("open", function() {

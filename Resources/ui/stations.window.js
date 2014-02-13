@@ -1,33 +1,27 @@
 exports.create = function() {
 	var self = Ti.UI.createWindow({});
-	self.mapview = require('ui/map.widget').create();
-	if (self.mapview.apiName != 'Ti.Proxy')
-		self.add(self.mapview);
-		self.publiclist = require('ui/publicstations.listview').create();
-	self.alllist = require('ui/allstations.listview').create();
-
-	self.add(self.publiclist);
-	self.add(self.alllist);
+	self.container = Ti.UI.createScrollableView({
+		scrollingEnabled : false,
+		showPagingControl : true
+	});
+	self.views = [require('ui/publicstations.listview').create(), require('ui/allstations.listview').create(), require('ui/map.widget').create()];
+	self.addEventListener('focus', function() {
+		self.container.setViews(self.views);
+	});
+	self.add(self.container);
 	self.setList = function(_type) {
 		switch (_type) {
 			case 'public':
-				self.publiclist.setVisible(true);
-				self.alllist.setVisible(false);
-				self.mapview.setVisible(false);
-				break;
-			case 'map' :
-				break;
-				self.alllist.setVisible(false);
-				self.mapview.setVisible(true);
-				self.publiclist.setVisible(false);
+				self.container.scrollToView(0);
 				break;
 			case 'all':
-				self.alllist.setVisible(true);
-				self.publiclist.setVisible(false);
-				self.mapview.setVisible(false);
+				self.container.scrollToView(1);
+				break;
+			case 'map' :
+				self.container.scrollToView(2);
 				break;
 		}
 	};
-	//self.setList('public');
+	self.setList('public');
 	return self;
 };
